@@ -603,6 +603,33 @@ async function sendMessage(event) {
         true;
 
 
+    /* DEBUG AUTH */
+
+    console.log(
+        "🧑 CURRENT USER ID:",
+        currentUser.id
+    );
+
+    console.log(
+        "🎯 RECEIVER ID:",
+        receiverId
+    );
+
+    const {
+        data: { session }
+    } = await supabase.auth.getSession();
+
+    console.log(
+        "🔐 SESSION USER ID:",
+        session?.user?.id
+    );
+
+    console.log(
+        "🔐 AUTHENTICATED:",
+        !!session
+    );
+
+
     const {
         data,
         error
@@ -634,7 +661,14 @@ async function sendMessage(event) {
 
     if (error) {
 
-        console.error("❌ MESSAGE SEND ERROR:", JSON.stringify(error, null, 2));
+        console.error(
+            "❌ MESSAGE SEND ERROR:",
+            JSON.stringify(
+                error,
+                null,
+                2
+            )
+        );
 
         messageInput.disabled =
             false;
