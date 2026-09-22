@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,34 +10,62 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Undernet — Servers</title>
+    <title>Undernet — Server</title>
 
     <link
         rel="stylesheet"
-        href="../static/style.css"
+        href="style.css"
     >
+
 </head>
+
 
 <body class="falling-stars">
 
     <header class="topbar">
 
         <div class="topbar-left">
-            <a href="home.html" class="brand">
+
+            <a
+                href="servers.html"
+                class="brand"
+            >
                 ✦ UNDERNET
             </a>
+
         </div>
 
+
         <nav class="topbar-nav">
-            <a href="home.html">HOME</a>
-            <a href="friends.html">FRIENDS</a>
-            <a href="messages.html">MESSAGES</a>
-            <a href="servers.html" class="active">SERVERS</a>
+
+            <a href="home.html">
+                HOME
+            </a>
+
+            <a href="friends.html">
+                FRIENDS
+            </a>
+
+            <a href="messages.html">
+                MESSAGES
+            </a>
+
+            <a
+                href="servers.html"
+                class="active"
+            >
+                SERVERS
+            </a>
+
         </nav>
+
 
         <div class="topbar-user">
 
-            <div id="nav-avatar" class="nav-avatar">
+            <div
+                id="nav-avatar"
+                class="nav-avatar"
+            >
                 ?
             </div>
 
@@ -58,110 +87,54 @@
 
     <main class="page-content">
 
-        <section class="page-header">
+        <section class="server-chat">
 
-            <h1>SERVERS</h1>
+            <div class="server-chat-header">
 
-            <p>
-                The Undernet community network.
-            </p>
+                <a href="servers.html">
+                    ← SERVERS
+                </a>
 
-        </section>
+                <h1 id="server-name">
+                    LOADING...
+                </h1>
+
+                <p id="server-description"></p>
+
+            </div>
 
 
-        <section class="server-list">
+            <div
+                id="message-list"
+                class="message-list"
+            >
 
-            <article class="server-card">
+                <p>
+                    Loading messages...
+                </p>
 
-                <div class="server-icon">
-                    ❄
-                </div>
+            </div>
 
-                <div class="server-info">
 
-                    <h2>SNOWDIN</h2>
+            <form
+                id="server-message-form"
+                class="message-form"
+            >
 
-                    <p>
-                        A chilly community server for everyone.
-                    </p>
-
-                    <span class="server-status">
-                        COMMUNITY SERVER
-                    </span>
-
-                </div>
-
-                <button
-                    class="server-join"
-                    type="button"
-                    data-server="snowdin"
+                <input
+                    id="server-message-input"
+                    type="text"
+                    placeholder="Send a message..."
+                    maxlength="1000"
+                    autocomplete="off"
+                    required
                 >
-                    OPEN CHAT
+
+                <button type="submit">
+                    SEND
                 </button>
 
-            </article>
-
-
-            <article class="server-card">
-
-                <div class="server-icon">
-                    💧
-                </div>
-
-                <div class="server-info">
-
-                    <h2>WATERFALL</h2>
-
-                    <p>
-                        A quiet underground community beneath the falls.
-                    </p>
-
-                    <span class="server-status">
-                        COMMUNITY SERVER
-                    </span>
-
-                </div>
-
-                <button
-                    class="server-join"
-                    type="button"
-                    data-server="waterfall"
-                >
-                    OPEN CHAT
-                </button>
-
-            </article>
-
-
-            <article class="server-card">
-
-                <div class="server-icon">
-                    🔥
-                </div>
-
-                <div class="server-info">
-
-                    <h2>HOTLAND</h2>
-
-                    <p>
-                        A busy community surrounded by heat and machinery.
-                    </p>
-
-                    <span class="server-status">
-                        COMMUNITY SERVER
-                    </span>
-
-                </div>
-
-                <button
-                    class="server-join"
-                    type="button"
-                    data-server="hotland"
-                >
-                    OPEN CHAT
-                </button>
-
-            </article>
+            </form>
 
         </section>
 
@@ -170,7 +143,7 @@
 
     <script
         type="module"
-        src="../js/servers.js"
+        src="server.js"
     ></script>
 
 </body>
