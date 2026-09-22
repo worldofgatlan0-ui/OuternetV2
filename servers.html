@@ -10,7 +10,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Undernet — Server</title>
+    <title>Undernet — Servers</title>
 
     <link
         rel="stylesheet"
@@ -27,7 +27,7 @@
         <div class="topbar-left">
 
             <a
-                href="servers.html"
+                href="home.html"
                 class="brand"
             >
                 ✦ UNDERNET
@@ -87,54 +87,118 @@
 
     <main class="page-content">
 
-        <section class="server-chat">
+        <section class="page-header">
 
-            <div class="server-chat-header">
+            <h1>
+                SERVERS
+            </h1>
 
-                <a href="servers.html">
-                    ← SERVERS
-                </a>
+            <p>
+                The Undernet community network.
+            </p>
 
-                <h1 id="server-name">
-                    LOADING...
-                </h1>
-
-                <p id="server-description"></p>
-
-            </div>
+        </section>
 
 
-            <div
-                id="message-list"
-                class="message-list"
-            >
+        <section class="server-list">
 
-                <p>
-                    Loading messages...
-                </p>
+            <article class="server-card">
 
-            </div>
+                <div class="server-icon">
+                    ❄
+                </div>
 
+                <div class="server-info">
 
-            <form
-                id="server-message-form"
-                class="message-form"
-            >
+                    <h2>
+                        SNOWDIN
+                    </h2>
 
-                <input
-                    id="server-message-input"
-                    type="text"
-                    placeholder="Send a message..."
-                    maxlength="1000"
-                    autocomplete="off"
-                    required
+                    <p>
+                        A chilly community server for everyone.
+                    </p>
+
+                    <span class="server-status">
+                        COMMUNITY SERVER
+                    </span>
+
+                </div>
+
+                <button
+                    class="server-join"
+                    type="button"
+                    data-server="snowdin"
                 >
-
-                <button type="submit">
-                    SEND
+                    OPEN CHAT
                 </button>
 
-            </form>
+            </article>
+
+
+            <article class="server-card">
+
+                <div class="server-icon">
+                    💧
+                </div>
+
+                <div class="server-info">
+
+                    <h2>
+                        WATERFALL
+                    </h2>
+
+                    <p>
+                        A quiet underground community beneath the falls.
+                    </p>
+
+                    <span class="server-status">
+                        COMMUNITY SERVER
+                    </span>
+
+                </div>
+
+                <button
+                    class="server-join"
+                    type="button"
+                    data-server="waterfall"
+                >
+                    OPEN CHAT
+                </button>
+
+            </article>
+
+
+            <article class="server-card">
+
+                <div class="server-icon">
+                    🔥
+                </div>
+
+                <div class="server-info">
+
+                    <h2>
+                        HOTLAND
+                    </h2>
+
+                    <p>
+                        A busy community surrounded by heat and machinery.
+                    </p>
+
+                    <span class="server-status">
+                        COMMUNITY SERVER
+                    </span>
+
+                </div>
+
+                <button
+                    class="server-join"
+                    type="button"
+                    data-server="hotland"
+                >
+                    OPEN CHAT
+                </button>
+
+            </article>
 
         </section>
 
@@ -143,7 +207,7 @@
 
     <script
         type="module"
-        src="server.js"
+        src="servers.js"
     ></script>
 
 </body>
