@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Undernet — Server</title>
+
+    <link
+        rel="stylesheet"
+        href="../static/style.css"
+    >
+
+</head>
+
+
+<body class="falling-stars">
+
+    <header class="topbar">
+
+        <div class="topbar-left">
+
+            <a
+                href="servers.html"
+                class="brand"
+            >
+                ✦ UNDERNET
+            </a>
+
+        </div>
+
+
+        <nav class="topbar-nav">
+
+            <a href="home.html">
+                HOME
+            </a>
+
+            <a href="friends.html">
+                FRIENDS
+            </a>
+
+            <a href="messages.html">
+                MESSAGES
+            </a>
+
+            <a
+                href="servers.html"
+                class="active"
+            >
+                SERVERS
+            </a>
+
+        </nav>
+
+
+        <div class="topbar-user">
+
+            <div
+                id="nav-avatar"
+                class="nav-avatar"
+            >
+                ?
+            </div>
+
+            <span id="nav-username">
+                Loading...
+            </span>
+
+            <button
+                id="logout-button"
+                type="button"
+            >
+                LOG OUT
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main class="page-content">
+
+        <section class="server-chat">
+
+            <div class="server-chat-header">
+
+                <a href="servers.html">
+                    ← SERVERS
+                </a>
+
+                <h1 id="server-name">
+                    LOADING...
+                </h1>
+
+                <p id="server-description"></p>
+
+            </div>
+
+
+            <div
+                id="message-list"
+                class="message-list"
+            >
+                <p>
+                    Loading messages...
+                </p>
+            </div>
+
+
+            <form
+                id="server-message-form"
+                class="message-form"
+            >
+
+                <input
+                    id="server-message-input"
+                    type="text"
+                    placeholder="Send a message..."
+                    maxlength="1000"
+                    autocomplete="off"
+                    required
+                >
+
+                <button type="submit">
+                    SEND
+                </button>
+
+            </form>
+
+        </section>
+
+    </main>
+
+
+    <script
+        type="module"
+        src="../js/server.js"
+    ></script>
+
+</body>
+
+</html>

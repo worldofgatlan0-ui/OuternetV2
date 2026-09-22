@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Friends - Undernet</title>
+
+    <!-- Correct path: static/style.css -->
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+
+<body class="falling-stars">
+
+<div class="undernet">
+
+    <!-- TOP BAR -->
+
+    <header class="topbar">
+
+        <div class="logo">
+            UNDERNET
+        </div>
+
+        <div class="top-actions">
+            <button type="button" title="Search">🔍</button>
+            <button type="button" title="Settings">⚙️</button>
+        </div>
+
+    </header>
+
+
+    <!-- SIDEBAR -->
+
+    <nav class="nav-zone">
+
+        <div class="menu-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+
+        <div class="nav-panel">
+
+            <!-- PROFILE -->
+
+            <div class="nav-profile">
+
+                <div class="big-avatar" id="nav-avatar">
+                    ?
+                </div>
+
+                <div>
+                    <strong id="nav-username">
+                        Loading...
+                    </strong>
+
+                    <span>
+                        🟢 Online
+                    </span>
+                </div>
+
+            </div>
+
+
+            <!-- NAVIGATION -->
+
+            <div class="nav-links">
+
+                <a href="home.html" class="nav-link">
+                    <span>🏠</span>
+                    <label>Home</label>
+                </a>
+
+                <a href="messages.html" class="nav-link">
+                    <span>💬</span>
+                    <label>Messages</label>
+                </a>
+
+                <a href="friends.html" class="nav-link active">
+                    <span>👥</span>
+                    <label>Friends</label>
+                </a>
+
+            </div>
+
+
+            <!-- SERVERS -->
+
+            <div class="nav-heading">
+                SERVERS
+            </div>
+
+            <div class="server-list">
+
+                <a href="#" class="server">
+                    <span>❄️</span>
+                    <label>Snowdin</label>
+                </a>
+
+                <a href="#" class="server">
+                    <span>💧</span>
+                    <label>Waterfall</label>
+                </a>
+
+                <a href="#" class="server">
+                    <span>🔥</span>
+                    <label>Hotland</label>
+                </a>
+
+            </div>
+
+
+            <button type="button" class="add-server">
+                ＋ Add Server
+            </button>
+
+
+            <!-- BOTTOM NAV -->
+
+            <div class="nav-bottom">
+
+                <a href="#" class="nav-link">
+                    <span>🔔</span>
+                    <label>Activity</label>
+                </a>
+
+                <a href="#" class="nav-link">
+                    <span>⚙️</span>
+                    <label>Settings</label>
+                </a>
+
+                <button
+                    type="button"
+                    class="nav-link logout"
+                    id="logout-button"
+                >
+                    <span>↪️</span>
+                    <label>Log Out</label>
+                </button>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="content">
+
+        <div class="content-header">
+            <h2>Friends</h2>
+        </div>
+
+
+        <div class="friends-page">
+
+            <!-- STATUS MESSAGE -->
+
+            <div
+                id="friend-notice"
+                class="friend-notice"
+                style="display: none;"
+            ></div>
+
+
+            <!-- SEARCH -->
+
+            <section class="friends-search">
+
+                <h1>Find People</h1>
+
+                <p>
+                    Search the Undernet for other users.
+                </p>
+
+
+                <form
+                    id="friend-search-form"
+                    class="friend-search-form"
+                >
+
+                    <input
+                        id="friend-search-input"
+                        type="text"
+                        placeholder="Search username..."
+                        autocomplete="off"
+                        maxlength="32"
+                    >
+
+                    <button type="submit">
+                        Search
+                    </button>
+
+                </form>
+
+            </section>
+
+
+            <!-- SEARCH RESULTS -->
+
+            <section
+                id="search-results-section"
+                class="friends-section"
+                style="display: none;"
+            >
+
+                <h2>
+                    Search Results
+                </h2>
+
+                <div
+                    id="search-results"
+                    class="friend-list"
+                ></div>
+
+            </section>
+
+
+            <!-- INCOMING REQUESTS -->
+
+            <section class="friends-section">
+
+                <h2>
+                    Incoming Requests
+                </h2>
+
+                <div
+                    id="incoming-requests"
+                    class="friend-list"
+                >
+
+                    <div class="empty-box">
+                        Loading friend requests...
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- SENT REQUESTS -->
+
+            <section class="friends-section">
+
+                <h2>
+                    Sent Requests
+                </h2>
+
+                <div
+                    id="outgoing-requests"
+                    class="friend-list"
+                >
+
+                    <div class="empty-box">
+                        Loading sent requests...
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- FRIEND LIST -->
+
+            <section class="friends-section">
+
+                <h2>
+                    Your Friends
+                </h2>
+
+                <div
+                    id="friend-list"
+                    class="friend-list"
+                >
+
+                    <div class="empty-box">
+                        Loading friends...
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- SUPABASE / FRIENDS -->
+
+<script
+    type="module"
+    src="../js/friends.js"
+></script>
+
+</body>
+</html>

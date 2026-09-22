@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Undernet — Servers</title>
+
+    <link
+        rel="stylesheet"
+        href="../static/style.css"
+    >
+</head>
+
+<body class="falling-stars">
+
+    <header class="topbar">
+
+        <div class="topbar-left">
+            <a href="home.html" class="brand">
+                ✦ UNDERNET
+            </a>
+        </div>
+
+        <nav class="topbar-nav">
+            <a href="home.html">HOME</a>
+            <a href="friends.html">FRIENDS</a>
+            <a href="messages.html">MESSAGES</a>
+            <a href="servers.html" class="active">SERVERS</a>
+        </nav>
+
+        <div class="topbar-user">
+
+            <div id="nav-avatar" class="nav-avatar">
+                ?
+            </div>
+
+            <span id="nav-username">
+                Loading...
+            </span>
+
+            <button
+                id="logout-button"
+                type="button"
+            >
+                LOG OUT
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main class="page-content">
+
+        <section class="page-header">
+
+            <h1>SERVERS</h1>
+
+            <p>
+                The Undernet community network.
+            </p>
+
+        </section>
+
+
+        <section class="server-list">
+
+            <article class="server-card">
+
+                <div class="server-icon">
+                    ❄
+                </div>
+
+                <div class="server-info">
+
+                    <h2>SNOWDIN</h2>
+
+                    <p>
+                        A chilly community server for everyone.
+                    </p>
+
+                    <span class="server-status">
+                        COMMUNITY SERVER
+                    </span>
+
+                </div>
+
+                <button
+                    class="server-join"
+                    type="button"
+                    data-server="snowdin"
+                >
+                    OPEN CHAT
+                </button>
+
+            </article>
+
+
+            <article class="server-card">
+
+                <div class="server-icon">
+                    💧
+                </div>
+
+                <div class="server-info">
+
+                    <h2>WATERFALL</h2>
+
+                    <p>
+                        A quiet underground community beneath the falls.
+                    </p>
+
+                    <span class="server-status">
+                        COMMUNITY SERVER
+                    </span>
+
+                </div>
+
+                <button
+                    class="server-join"
+                    type="button"
+                    data-server="waterfall"
+                >
+                    OPEN CHAT
+                </button>
+
+            </article>
+
+
+            <article class="server-card">
+
+                <div class="server-icon">
+                    🔥
+                </div>
+
+                <div class="server-info">
+
+                    <h2>HOTLAND</h2>
+
+                    <p>
+                        A busy community surrounded by heat and machinery.
+                    </p>
+
+                    <span class="server-status">
+                        COMMUNITY SERVER
+                    </span>
+
+                </div>
+
+                <button
+                    class="server-join"
+                    type="button"
+                    data-server="hotland"
+                >
+                    OPEN CHAT
+                </button>
+
+            </article>
+
+        </section>
+
+    </main>
+
+
+    <script
+        type="module"
+        src="../js/servers.js"
+    ></script>
+
+</body>
+
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Messages - Undernet</title>
+
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+
+<body>
+
+<div class="undernet">
+
+    <!-- TOP BAR -->
+
+    <header class="topbar">
+
+        <div class="logo">
+            UNDERNET
+        </div>
+
+        <div class="top-actions">
+            <button type="button" title="Search">🔍</button>
+            <button type="button" title="Settings">⚙️</button>
+        </div>
+
+    </header>
+
+
+    <!-- SIDEBAR -->
+
+    <nav class="nav-zone">
+
+        <div class="menu-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+
+        <div class="nav-panel">
+
+            <!-- PROFILE -->
+
+            <div class="nav-profile">
+
+                <div class="big-avatar" id="nav-avatar">
+                    ?
+                </div>
+
+                <div>
+                    <strong id="nav-username">
+                        Loading...
+                    </strong>
+
+                    <span>
+                        🟢 Online
+                    </span>
+                </div>
+
+            </div>
+
+
+            <!-- NAVIGATION -->
+
+            <div class="nav-links">
+
+                <a href="home.html" class="nav-link">
+                    <span>🏠</span>
+                    <label>Home</label>
+                </a>
+
+                <a href="messages.html" class="nav-link active">
+                    <span>💬</span>
+                    <label>Messages</label>
+                </a>
+
+                <a href="friends.html" class="nav-link">
+                    <span>👥</span>
+                    <label>Friends</label>
+                </a>
+
+            </div>
+
+
+            <!-- SERVERS -->
+
+            <div class="nav-heading">
+                SERVERS
+            </div>
+
+            <div class="server-list">
+
+                <a href="#" class="server">
+                    <span>❄️</span>
+                    <label>Snowdin</label>
+                </a>
+
+                <a href="#" class="server">
+                    <span>💧</span>
+                    <label>Waterfall</label>
+                </a>
+
+                <a href="#" class="server">
+                    <span>🔥</span>
+                    <label>Hotland</label>
+                </a>
+
+            </div>
+
+
+            <button type="button" class="add-server">
+                ＋ Add Server
+            </button>
+
+
+            <!-- BOTTOM NAV -->
+
+            <div class="nav-bottom">
+
+                <a href="#" class="nav-link">
+                    <span>🔔</span>
+                    <label>Activity</label>
+                </a>
+
+                <a href="#" class="nav-link">
+                    <span>⚙️</span>
+                    <label>Settings</label>
+                </a>
+
+                <button
+                    type="button"
+                    class="nav-link logout"
+                    id="logout-button"
+                >
+                    <span>↪️</span>
+                    <label>Log Out</label>
+                </button>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="content">
+
+        <div class="messages-page">
+
+
+            <!-- CONVERSATION HEADER -->
+
+            <div class="messages-header">
+
+                <button
+                    type="button"
+                    class="back-button"
+                    onclick="window.location.href='friends.html'"
+                >
+                    ← Friends
+                </button>
+
+
+                <div
+                    class="message-user"
+                    id="message-user"
+                    style="display: none;"
+                >
+
+                    <div
+                        class="message-avatar"
+                        id="message-avatar"
+                    >
+                        ?
+                    </div>
+
+                    <div>
+
+                        <h1 id="message-username">
+                            Loading...
+                        </h1>
+
+                        <span>
+                            🟢 Online
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="message-user"
+                    id="messages-default-header"
+                >
+
+                    <div class="message-avatar">
+                        💬
+                    </div>
+
+                    <div>
+
+                        <h1>
+                            Messages
+                        </h1>
+
+                        <span>
+                            Your conversations
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CHAT -->
+
+            <div
+                class="chat-area"
+                id="chat-area"
+            >
+
+                <div class="empty-chat">
+
+                    <div class="empty-chat-icon">
+                        💬
+                    </div>
+
+                    <h2>
+                        Select a friend
+                    </h2>
+
+                    <p>
+                        Choose a friend from your Friends list
+                        to start messaging.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- MESSAGE FORM -->
+
+            <form
+                id="message-form"
+                class="message-form"
+                style="display: none;"
+            >
+
+                <input
+                    id="message-input"
+                    name="message"
+                    type="text"
+                    placeholder="Type a message..."
+                    maxlength="2000"
+                    autocomplete="off"
+                    required
+                >
+
+                <button type="submit">
+                    Send
+                </button>
+
+            </form>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- SUPABASE / MESSAGES -->
+
+<script
+    type="module"
+    src="../js/messages.js"
+></script>
+
+</body>
+</html>

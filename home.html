@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Undernet</title>
+
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+
+<body class="falling-stars">
+
+<div class="undernet">
+
+    <!-- TOP BAR -->
+
+    <header class="topbar">
+
+        <div class="logo">
+            UNDERNET
+        </div>
+
+        <div class="top-actions">
+            <button type="button" title="Search">🔍</button>
+            <button type="button" title="Settings">⚙️</button>
+        </div>
+
+    </header>
+
+
+    <!-- SIDEBAR -->
+
+    <nav class="nav-zone">
+
+        <div class="menu-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="nav-panel">
+
+            <!-- PROFILE -->
+
+            <div class="nav-profile">
+
+                <div class="big-avatar" id="nav-avatar">
+                    ?
+                </div>
+
+                <div>
+                    <strong id="nav-username">
+                        Loading...
+                    </strong>
+
+                    <span>
+                        🟢 Online
+                    </span>
+                </div>
+
+            </div>
+
+
+            <!-- MAIN NAVIGATION -->
+
+            <div class="nav-links">
+
+                <a href="home.html" class="nav-link active">
+                    <span>🏠</span>
+                    <label>Home</label>
+                </a>
+
+                <a href="messages.html" class="nav-link">
+                    <span>💬</span>
+                    <label>Messages</label>
+                </a>
+
+                <a href="friends.html" class="nav-link">
+                    <span>👥</span>
+                    <label>Friends</label>
+                </a>
+
+            </div>
+
+
+            <!-- SERVERS -->
+
+            <div class="nav-heading">
+                SERVERS
+            </div>
+
+            <div class="server-list">
+
+                <a href="#" class="server">
+                    <span>❄️</span>
+                    <label>Snowdin</label>
+                </a>
+
+                <a href="#" class="server">
+                    <span>💧</span>
+                    <label>Waterfall</label>
+                </a>
+
+                <a href="#" class="server">
+                    <span>🔥</span>
+                    <label>Hotland</label>
+                </a>
+
+            </div>
+
+
+            <button type="button" class="add-server">
+                ＋ Add Server
+            </button>
+
+
+            <!-- BOTTOM NAV -->
+
+            <div class="nav-bottom">
+
+                <a href="#" class="nav-link">
+                    <span>🔔</span>
+                    <label>Activity</label>
+                </a>
+
+                <a href="#" class="nav-link">
+                    <span>⚙️</span>
+                    <label>Settings</label>
+                </a>
+
+                <button
+                    type="button"
+                    class="nav-link logout"
+                    id="logout-button"
+                >
+                    <span>↪️</span>
+                    <label>Log Out</label>
+                </button>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="content">
+
+        <div class="content-header">
+            <h2>Home</h2>
+        </div>
+
+        <div class="content-body">
+
+            <div class="welcome">
+
+                <div class="welcome-icon">
+                    👋
+                </div>
+
+                <h1>
+                    Welcome to the Undernet!
+                </h1>
+
+                <p>
+                    You're logged in as
+                    <strong id="welcome-username">
+                        Loading...
+                    </strong>.
+                </p>
+
+                <div class="quick-actions">
+
+                    <button
+                        type="button"
+                        onclick="window.location.href='messages.html'"
+                    >
+                        💬 Messages
+                    </button>
+
+                    <button
+                        type="button"
+                        onclick="window.location.href='friends.html'"
+                    >
+                        👥 Friends
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- SUPABASE / PROFILE -->
+
+<script
+    type="module"
+    src="../js/profile.js"
+></script>
+
+</body>
+</html>

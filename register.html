@@ -1,0 +1,131 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Undernet — Register</title>
+
+    <link
+        rel="stylesheet"
+        href="../static/style.css"
+    >
+
+    <style>
+        /* AUTH PAGE */
+
+        .auth-screen {
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-box {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+</head>
+
+<body class="falling-stars">
+
+    <main class="auth-screen">
+
+        <section class="auth-box">
+
+            <div class="auth-content">
+
+                <div class="auth-logo">
+                    <div class="auth-symbol">✦</div>
+
+                    <h1>UNDERNET</h1>
+
+                    <p class="auth-subtitle">
+                        CREATE YOUR NETWORK IDENTITY
+                    </p>
+                </div>
+
+                <form
+                    id="register-form"
+                    class="auth-form"
+                >
+
+                    <label for="username">
+                        Username
+                    </label>
+
+                    <input
+                        id="username"
+                        name="username"
+                        type="text"
+                        placeholder="Choose a username"
+                        maxlength="32"
+                        autocomplete="username"
+                        required
+                    >
+
+                    <label for="email">
+                        Email
+                    </label>
+
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required
+                    >
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        placeholder="Choose a password"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <button type="submit">
+                        CREATE ACCOUNT
+                    </button>
+
+                </form>
+
+                <div class="auth-divider">
+                    <span>ALREADY CONNECTED?</span>
+                </div>
+
+                <div class="auth-footer">
+                    Already have an account?
+                    <a href="login.html">
+                        Log in
+                    </a>
+                </div>
+
+            </div>
+
+            <div
+                id="error"
+                class="auth-status"
+                role="alert"
+                aria-live="polite"
+                hidden
+            ></div>
+
+        </section>
+
+    </main>
+
+    <script type="module" src="../js/auth.js"></script>
+
+</body>
+</html>
