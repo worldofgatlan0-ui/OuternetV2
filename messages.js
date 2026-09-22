@@ -11,6 +11,11 @@ const navAvatar = document.getElementById("nav-avatar");
 const logoutButton = document.getElementById("logout-button");
 
 let currentUser = null;
+let receiverId = null;
+
+/* GET RECIPIENT FROM URL */
+const params = new URLSearchParams(window.location.search);
+receiverId = params.get("user");
 
 /* LOAD USER */
 async function loadUser() {
@@ -61,7 +66,13 @@ async function loadUser() {
 
 /* LOAD MESSAGES */
 async function loadMessages() {
-    if (!messageList) return;
+    if (!messageList || !currentUser) return;
+
+    if (!receiverId) {
+        messageList.innerHTML =
+            "<p>Select a friend to start chatting.</p>";
+        return;
+    }
 
     const { data, error } = await supabase
         .from("messages")
@@ -77,7 +88,7 @@ async function loadMessages() {
             )
         `)
         .or(
-            `sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`
+            `and(sender_id.eq.${currentUser.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${currentUser.id})`
         )
         .order("created_at", {
             ascending: true
@@ -85,8 +96,10 @@ async function loadMessages() {
 
     if (error) {
         console.error("MESSAGE LOAD ERROR:", error);
+
         messageList.innerHTML =
             "<p>Could not load messages.</p>";
+
         return;
     }
 
@@ -94,7 +107,7 @@ async function loadMessages() {
 
     if (!data || data.length === 0) {
         messageList.innerHTML =
-            "<p>No messages yet.</p>";
+            "<p>No messages yet. Say hi!</p>";
         return;
     }
 
@@ -104,7 +117,11 @@ async function loadMessages() {
 /* DISPLAY MESSAGE */
 function addMessage(message) {
     const article = document.createElement("article");
-    article.className = "message";
+
+    article.className =
+        message.sender_id === currentUser.id
+            ? "message message-own"
+            : "message";
 
     const username =
         message.sender?.display_name ||
@@ -132,23 +149,17 @@ async function sendMessage(event) {
 
     if (!currentUser || !messageInput) return;
 
-    const content = messageInput.value.trim();
+    const content =
+        messageInput.value.trim();
 
     if (!content) return;
 
-    messageInput.disabled = true;
-
-    /*
-        Change these two IDs later when
-        friend/recipient selection exists.
-    */
-    const receiverId = messageInput.dataset.receiverId;
-
     if (!receiverId) {
         console.error("No recipient selected.");
-        messageInput.disabled = false;
         return;
     }
+
+    messageInput.disabled = true;
 
     const { data, error } = await supabase
         .from("messages")
@@ -171,7 +182,11 @@ async function sendMessage(event) {
         .single();
 
     if (error) {
-        console.error("MESSAGE SEND ERROR:", error);
+        console.error(
+            "MESSAGE SEND ERROR:",
+            error
+        );
+
         messageInput.disabled = false;
         return;
     }
@@ -190,11 +205,15 @@ async function logout() {
         await supabase.auth.signOut();
 
     if (error) {
-        console.error("LOGOUT ERROR:", error);
+        console.error(
+            "LOGOUT ERROR:",
+            error
+        );
         return;
     }
 
-    window.location.href = "login.html";
+    window.location.href =
+        "login.html";
 }
 
 /* EVENTS */
@@ -213,7 +232,8 @@ if (logoutButton) {
 }
 
 /* START */
-const loggedIn = await loadUser();
+const loggedIn =
+    await loadUser();
 
 if (loggedIn) {
     await loadMessages();
