@@ -634,10 +634,7 @@ async function sendMessage(event) {
 
     if (error) {
 
-        console.error(
-            "❌ MESSAGE SEND ERROR:",
-            error
-        );
+        console.error("❌ MESSAGE SEND ERROR:", JSON.stringify(error, null, 2));
 
         messageInput.disabled =
             false;
