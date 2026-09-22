@@ -1,6 +1,8 @@
+console.log("🔥 UNDERNET MESSAGES.JS LOADED");
+
 import { supabase } from "./supabase.js";
 
-console.log("🔥 UNDERNET MESSAGES.JS LOADED");
+console.log("🟢 SUPABASE IMPORTED");
 
 console.log("1️⃣ GETTING ELEMENTS");
 
