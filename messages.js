@@ -40,6 +40,8 @@ let receiverId = null;
 
 /* LOAD USER */
 async function loadUser() {
+    console.log("🔍 STARTING LOAD USER...");
+    
     const {
         data: { user },
         error
