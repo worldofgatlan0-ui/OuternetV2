@@ -1,48 +1,14 @@
 import { supabase } from "./supabase.js";
 
-console.log("UNDERNET FRIENDS.JS LOADED");
+console.log("🔥 FRIENDS.JS LOADED");
 
-const searchForm =
-    document.getElementById("friend-search-form");
-
-const searchInput =
-    document.getElementById("friend-search-input");
-
-const searchResultsSection =
-    document.getElementById("search-results-section");
-
-const searchResults =
-    document.getElementById("search-results");
-
-const friendList =
-    document.getElementById("friend-list");
-
-const notice =
-    document.getElementById("friend-notice");
-
-const navUsername =
-    document.getElementById("nav-username");
-
-const navAvatar =
-    document.getElementById("nav-avatar");
+const searchForm = document.getElementById("friend-search-form");
+const searchInput = document.getElementById("friend-search-input");
+const searchResults = document.getElementById("search-results");
+const searchResultsSection = document.getElementById("search-results-section");
+const friendList = document.getElementById("friend-list");
 
 let currentUser = null;
-
-
-/* NOTICE */
-function showNotice(message) {
-    if (!notice) return;
-
-    notice.textContent = message;
-    notice.style.display = "block";
-}
-
-function clearNotice() {
-    if (!notice) return;
-
-    notice.textContent = "";
-    notice.style.display = "none";
-}
 
 
 /* LOAD USER */
@@ -59,118 +25,43 @@ async function loadUser() {
 
     currentUser = user;
 
-    const { data: profile } =
-        await supabase
-            .from("profiles")
-            .select(
-                "username, display_name, avatar_url"
-            )
-            .eq("id", user.id)
-            .maybeSingle();
-
-    const username =
-        profile?.display_name ||
-        profile?.username ||
-        user.email?.split("@")[0] ||
-        "Unknown";
-
-    if (navUsername) {
-        navUsername.textContent = username;
-    }
-
-    if (navAvatar) {
-        if (profile?.avatar_url) {
-            navAvatar.textContent = "";
-
-            navAvatar.style.backgroundImage =
-                `url("${profile.avatar_url}")`;
-
-            navAvatar.style.backgroundSize =
-                "cover";
-
-            navAvatar.style.backgroundPosition =
-                "center";
-        } else {
-            navAvatar.style.backgroundImage = "";
-
-            navAvatar.textContent =
-                username
-                    .charAt(0)
-                    .toUpperCase();
-        }
-    }
+    console.log("👤 LOGGED IN:", user.id);
 
     return true;
 }
 
 
-/* CHECK FRIENDSHIP */
-async function areFriends(userId) {
-    const { data, error } =
-        await supabase
-            .from("friendships")
-            .select("id")
-            .or(
-                `and(user1_id.eq.${currentUser.id},user2_id.eq.${userId}),and(user1_id.eq.${userId},user2_id.eq.${currentUser.id})`
-            )
-            .maybeSingle();
-
-    if (error) {
-        console.error(
-            "FRIENDSHIP CHECK ERROR:",
-            error
-        );
-
-        return false;
-    }
-
-    return !!data;
-}
-
-
-/* SEARCH USERS */
+/* SEARCH */
 async function searchUsers(event) {
     event.preventDefault();
 
-    clearNotice();
+    console.log("🔎 SEARCH SUBMITTED");
 
-    const search =
-        searchInput?.value.trim();
+    const username = searchInput.value.trim();
 
-    if (!search) {
-        showNotice(
-            "Enter a username to search."
-        );
+    if (!username) {
+        alert("Enter a username.");
         return;
     }
+
+    searchResultsSection.style.display = "block";
 
     searchResults.innerHTML =
         "<div class='empty-box'>Searching...</div>";
 
-    searchResultsSection.style.display =
-        "block";
+    const { data, error } = await supabase
+        .from("profiles")
+        .select("id, username, display_name, avatar_url")
+        .ilike("username", `%${username}%`)
+        .limit(20);
 
-    const { data, error } =
-        await supabase
-            .from("profiles")
-            .select(
-                "id, username, display_name, avatar_url"
-            )
-            .ilike(
-                "username",
-                `%${search}%`
-            )
-            .limit(20);
+    console.log("SEARCH RESULT:", data, error);
 
     if (error) {
-        console.error(
-            "USER SEARCH ERROR:",
-            error
-        );
-
         searchResults.innerHTML =
-            "<div class='empty-box'>Search failed.</div>";
+            "<div class='empty-box'>Search error.</div>";
 
+        console.error(error);
         return;
     }
 
@@ -183,198 +74,122 @@ async function searchUsers(event) {
         return;
     }
 
-    for (const profile of data) {
-        await addSearchResult(profile);
-    }
+    data.forEach(showUser);
 }
 
 
-/* DISPLAY SEARCH RESULT */
-async function addSearchResult(profile) {
-    const card =
-        document.createElement("div");
+/* SHOW USER */
+function showUser(profile) {
 
-    card.className =
-        "friend-card";
+    const card = document.createElement("div");
+    card.className = "friend-card";
 
-    const avatar =
-        document.createElement("div");
-
-    avatar.className =
-        "friend-avatar";
-
-    if (profile.avatar_url) {
-        avatar.style.backgroundImage =
-            `url("${profile.avatar_url}")`;
-
-        avatar.style.backgroundSize =
-            "cover";
-
-        avatar.style.backgroundPosition =
-            "center";
-    } else {
-        avatar.textContent =
-            (
-                profile.display_name ||
-                profile.username ||
-                "?"
-            )
-            .charAt(0)
-            .toUpperCase();
-    }
-
-    const info =
-        document.createElement("div");
-
-    info.className =
-        "friend-info";
-
-    const name =
-        document.createElement("strong");
+    const name = document.createElement("strong");
 
     name.textContent =
         profile.display_name ||
-        profile.username ||
-        "Unknown";
+        profile.username;
 
-    const username =
-        document.createElement("span");
+    const username = document.createElement("span");
 
     username.textContent =
         "@" + profile.username;
 
-    const addButton =
-        document.createElement("button");
+    const button = document.createElement("button");
 
-    addButton.type = "button";
-    addButton.textContent = "ADD";
+    button.type = "button";
+    button.textContent = "ADD";
 
-    info.appendChild(name);
-    info.appendChild(username);
-
-    card.appendChild(avatar);
-    card.appendChild(info);
-    card.appendChild(addButton);
+    card.appendChild(name);
+    card.appendChild(username);
+    card.appendChild(button);
 
     searchResults.appendChild(card);
 
-    /* DON'T ADD YOURSELF */
+
+    /* YOURSELF */
     if (profile.id === currentUser.id) {
-        addButton.textContent = "YOU";
-        addButton.disabled = true;
+
+        button.textContent = "YOU";
+        button.disabled = true;
+
         return;
     }
 
-    /* CHECK EXISTING FRIENDSHIP */
-    const alreadyFriends =
-        await areFriends(profile.id);
 
-    if (alreadyFriends) {
-        addButton.textContent =
-            "FRIENDS";
+    /* ADD */
+    button.addEventListener("click", async () => {
 
-        addButton.disabled = true;
-        return;
-    }
+        console.log(
+            "➕ ADDING:",
+            profile.username
+        );
 
-    /* ADD FRIEND */
-    addButton.addEventListener(
-        "click",
-        async () => {
+        button.disabled = true;
+        button.textContent = "ADDING...";
 
-            addButton.disabled = true;
-            addButton.textContent =
-                "ADDING...";
+        const { error } = await supabase
+            .from("friendships")
+            .insert({
+                user1_id: currentUser.id,
+                user2_id: profile.id
+            });
 
-            const { error } =
-                await supabase
-                    .from("friendships")
-                    .insert({
-                        user1_id:
-                            currentUser.id,
+        console.log(
+            "FRIENDSHIP INSERT:",
+            error
+        );
 
-                        user2_id:
-                            profile.id
-                    });
+        if (error) {
 
-            if (error) {
-                console.error(
-                    "ADD FRIEND ERROR:",
-                    error
-                );
+            console.error(error);
 
-                if (
-                    error.code === "23505"
-                ) {
-                    addButton.textContent =
-                        "FRIENDS";
-                } else {
-                    addButton.disabled =
-                        false;
+            button.disabled = false;
+            button.textContent = "ADD";
 
-                    addButton.textContent =
-                        "ADD";
+            alert(
+                "Could not add friend: " +
+                error.message
+            );
 
-                    showNotice(
-                        "Could not add friend."
-                    );
-
-                    return;
-                }
-            } else {
-                addButton.textContent =
-                    "FRIENDS";
-
-                showNotice(
-                    `Added @${profile.username}!`
-                );
-
-                await loadFriends();
-            }
-
-            addButton.disabled = true;
+            return;
         }
-    );
+
+        button.textContent = "FRIENDS";
+
+        alert(
+            "Added @" +
+            profile.username +
+            "!"
+        );
+
+        loadFriends();
+    });
 }
 
 
 /* LOAD FRIENDS */
 async function loadFriends() {
-    if (!friendList) return;
 
-    friendList.innerHTML =
-        "<div class='empty-box'>Loading friends...</div>";
-
-    const { data, error } =
-        await supabase
-            .from("friendships")
-            .select(
-                "id, user1_id, user2_id"
-            )
-            .or(
-                `user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`
-            );
-
-    if (error) {
-        console.error(
-            "FRIENDS LOAD ERROR:",
-            error
+    const { data, error } = await supabase
+        .from("friendships")
+        .select("id, user1_id, user2_id")
+        .or(
+            `user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`
         );
 
-        friendList.innerHTML =
-            "<div class='empty-box'>Could not load friends.</div>";
+    console.log(
+        "FRIENDS:",
+        data,
+        error
+    );
 
+    if (error) {
+        console.error(error);
         return;
     }
 
     friendList.innerHTML = "";
-
-    if (!data || data.length === 0) {
-        friendList.innerHTML =
-            "<div class='empty-box'>No friends yet.</div>";
-
-        return;
-    }
 
     for (const friendship of data) {
 
@@ -387,84 +202,47 @@ async function loadFriends() {
             await supabase
                 .from("profiles")
                 .select(
-                    "id, username, display_name, avatar_url"
+                    "username, display_name"
                 )
                 .eq("id", friendId)
                 .maybeSingle();
 
-        if (profile) {
-            addFriendCard(profile);
-        }
+        if (!profile) continue;
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "friend-card";
+
+        card.textContent =
+            profile.display_name ||
+            profile.username;
+
+        friendList.appendChild(card);
+    }
+
+    if (data.length === 0) {
+
+        friendList.innerHTML =
+            "<div class='empty-box'>No friends yet.</div>";
     }
 }
 
 
-/* DISPLAY FRIEND */
-function addFriendCard(profile) {
-    const card =
-        document.createElement("div");
+/* IMPORTANT */
+if (!searchForm) {
 
-    card.className =
-        "friend-card";
+    console.error(
+        "❌ friend-search-form NOT FOUND"
+    );
 
-    const avatar =
-        document.createElement("div");
+} else {
 
-    avatar.className =
-        "friend-avatar";
+    console.log(
+        "✅ SEARCH FORM FOUND"
+    );
 
-    if (profile.avatar_url) {
-        avatar.style.backgroundImage =
-            `url("${profile.avatar_url}")`;
-
-        avatar.style.backgroundSize =
-            "cover";
-
-        avatar.style.backgroundPosition =
-            "center";
-    } else {
-        avatar.textContent =
-            (
-                profile.display_name ||
-                profile.username ||
-                "?"
-            )
-            .charAt(0)
-            .toUpperCase();
-    }
-
-    const info =
-        document.createElement("div");
-
-    info.className =
-        "friend-info";
-
-    const name =
-        document.createElement("strong");
-
-    name.textContent =
-        profile.display_name ||
-        profile.username ||
-        "Unknown";
-
-    const username =
-        document.createElement("span");
-
-    username.textContent =
-        "@" + profile.username;
-
-    info.appendChild(name);
-    info.appendChild(username);
-
-    card.appendChild(avatar);
-    card.appendChild(info);
-
-    friendList.appendChild(card);
-}
-
-
-/* SEARCH EVENT */
-if (searchForm) {
     searchForm.addEventListener(
         "submit",
         searchUsers
@@ -473,8 +251,7 @@ if (searchForm) {
 
 
 /* START */
-const loggedIn =
-    await loadUser();
+const loggedIn = await loadUser();
 
 if (loggedIn) {
     await loadFriends();
