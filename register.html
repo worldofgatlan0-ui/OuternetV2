@@ -1,9 +1,9 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
@@ -13,7 +13,7 @@
 
     <link
         rel="stylesheet"
-        href="../static/style.css"
+        href="style.css"
     >
 
     <style>
@@ -40,14 +40,21 @@
             <div class="auth-content">
 
                 <div class="auth-logo">
-                    <div class="auth-symbol">✦</div>
 
-                    <h1>UNDERNET</h1>
+                    <div class="auth-symbol">
+                        ✦
+                    </div>
+
+                    <h1>
+                        UNDERNET
+                    </h1>
 
                     <p class="auth-subtitle">
                         CREATE YOUR NETWORK IDENTITY
                     </p>
+
                 </div>
+
 
                 <form
                     id="register-form"
@@ -68,6 +75,7 @@
                         required
                     >
 
+
                     <label for="email">
                         Email
                     </label>
@@ -80,6 +88,7 @@
                         autocomplete="email"
                         required
                     >
+
 
                     <label for="password">
                         Password
@@ -94,24 +103,33 @@
                         required
                     >
 
+
                     <button type="submit">
                         CREATE ACCOUNT
                     </button>
 
                 </form>
 
+
                 <div class="auth-divider">
-                    <span>ALREADY CONNECTED?</span>
+                    <span>
+                        ALREADY CONNECTED?
+                    </span>
                 </div>
 
+
                 <div class="auth-footer">
+
                     Already have an account?
+
                     <a href="login.html">
                         Log in
                     </a>
+
                 </div>
 
             </div>
+
 
             <div
                 id="error"
@@ -125,7 +143,12 @@
 
     </main>
 
-    <script type="module" src="../js/auth.js"></script>
+
+    <script
+        type="module"
+        src="auth.js"
+    ></script>
 
 </body>
+
 </html>
