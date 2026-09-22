@@ -1,10 +1,7 @@
-console.log("🔥 UNDERNET MESSAGES.JS LOADED");
-
 import { supabase } from "./supabase.js";
 
+console.log("🔥 UNDERNET MESSAGES.JS LOADED");
 console.log("🟢 SUPABASE IMPORTED");
-
-console.log("1️⃣ GETTING ELEMENTS");
 
 const conversationList =
     document.getElementById("conversation-list");
@@ -39,15 +36,16 @@ const navAvatar =
 const logoutButton =
     document.getElementById("logout-button");
 
-console.log("2️⃣ ELEMENTS DONE");
-
 let currentUser = null;
 let receiverId = null;
 
-console.log("3️⃣ VARIABLES DONE");
 
-/* LOAD USER */
+/* =========================
+   LOAD USER
+========================= */
+
 async function loadUser() {
+
     console.log("🔍 STARTING LOAD USER...");
 
     const {
@@ -58,47 +56,47 @@ async function loadUser() {
     console.log("🔐 AUTH CHECK FINISHED");
 
     if (error || !user) {
-        window.location.href = "login.html";
+
+        console.error(
+            "❌ AUTH ERROR:",
+            error
+        );
+
+        window.location.href =
+            "login.html";
+
         return false;
     }
 
     currentUser = user;
 
-    console.log("👤 LOGGED IN:", user.id);
+    console.log(
+        "👤 LOGGED IN:",
+        user.id
+    );
 
-    return true;
-}
 
-console.log("4️⃣ LOAD USER FUNCTION CREATED");
+    /* LOAD PROFILE */
 
-console.log("🚀 STARTING MESSAGES PAGE...");
-
-const loggedIn = await loadUser();
-
-console.log("✅ LOAD USER FINISHED:", loggedIn);
-    
     const {
-        data: { user },
-        error
-    } = await supabase.auth.getUser();
+        data: profile,
+        error: profileError
+    } = await supabase
+        .from("profiles")
+        .select(
+            "username, display_name, avatar_url"
+        )
+        .eq("id", user.id)
+        .maybeSingle();
 
-    if (error || !user) {
-        window.location.href = "login.html";
-        return false;
+    if (profileError) {
+
+        console.error(
+            "❌ PROFILE ERROR:",
+            profileError
+        );
     }
 
-    currentUser = user;
-
-    console.log("👤 LOGGED IN:", user.id);
-
-    const { data: profile } =
-        await supabase
-            .from("profiles")
-            .select(
-                "username, display_name, avatar_url"
-            )
-            .eq("id", user.id)
-            .maybeSingle();
 
     const username =
         profile?.display_name ||
@@ -106,20 +104,38 @@ console.log("✅ LOAD USER FINISHED:", loggedIn);
         user.email?.split("@")[0] ||
         "Unknown";
 
+
+    /* NAV USERNAME */
+
     if (navUsername) {
-        navUsername.textContent = username;
+
+        navUsername.textContent =
+            username;
     }
 
+
+    /* NAV AVATAR */
+
     if (navAvatar) {
+
         if (profile?.avatar_url) {
+
             navAvatar.textContent = "";
+
             navAvatar.style.backgroundImage =
                 `url("${profile.avatar_url}")`;
-            navAvatar.style.backgroundSize = "cover";
+
+            navAvatar.style.backgroundSize =
+                "cover";
+
             navAvatar.style.backgroundPosition =
                 "center";
+
         } else {
-            navAvatar.style.backgroundImage = "";
+
+            navAvatar.style.backgroundImage =
+                "";
+
             navAvatar.textContent =
                 username
                     .charAt(0)
@@ -130,14 +146,24 @@ console.log("✅ LOAD USER FINISHED:", loggedIn);
     return true;
 }
 
-/* LOAD FRIENDS */
+
+/* =========================
+   LOAD FRIENDS
+========================= */
+
 async function loadFriends() {
+
     if (!conversationList || !currentUser) {
         return;
     }
 
+    console.log(
+        "👥 LOADING FRIENDS..."
+    );
+
     conversationList.innerHTML =
         "<div class='empty-box'>Loading friends...</div>";
+
 
     const {
         data: friendships,
@@ -151,7 +177,16 @@ async function loadFriends() {
             `user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`
         );
 
+
+    console.log(
+        "👥 FRIENDSHIPS:",
+        friendships,
+        error
+    );
+
+
     if (error) {
+
         console.error(
             "❌ FRIENDSHIP ERROR:",
             error
@@ -163,27 +198,38 @@ async function loadFriends() {
         return;
     }
 
+
     if (
         !friendships ||
         friendships.length === 0
     ) {
+
         conversationList.innerHTML =
             "<div class='empty-box'>You don't have any friends yet.</div>";
 
         return;
     }
 
+
     const friendIds =
-        friendships.map((friendship) => {
-            return friendship.user1_id === currentUser.id
-                ? friendship.user2_id
-                : friendship.user1_id;
-        });
+        friendships.map(
+            (friendship) => {
+
+                return friendship.user1_id ===
+                    currentUser.id
+
+                    ? friendship.user2_id
+
+                    : friendship.user1_id;
+            }
+        );
+
 
     console.log(
-        "👥 FRIEND IDS:",
+        "🆔 FRIEND IDS:",
         friendIds
     );
+
 
     const {
         data: friends,
@@ -193,9 +239,21 @@ async function loadFriends() {
         .select(
             "id, username, display_name, avatar_url"
         )
-        .in("id", friendIds);
+        .in(
+            "id",
+            friendIds
+        );
+
+
+    console.log(
+        "👤 FRIEND PROFILES:",
+        friends,
+        friendError
+    );
+
 
     if (friendError) {
+
         console.error(
             "❌ FRIEND PROFILE ERROR:",
             friendError
@@ -207,24 +265,30 @@ async function loadFriends() {
         return;
     }
 
-    console.log(
-        "👥 FRIENDS:",
-        friends
-    );
 
     conversationList.innerHTML = "";
 
-    friends.forEach(createConversation);
+
+    friends.forEach(
+        createConversation
+    );
 }
 
-/* CREATE FRIEND ITEM */
+
+/* =========================
+   CREATE FRIEND ITEM
+========================= */
+
 function createConversation(friend) {
+
     const item =
         document.createElement("button");
 
     item.type = "button";
+
     item.className =
         "conversation-item";
+
 
     const avatar =
         document.createElement("div");
@@ -232,12 +296,15 @@ function createConversation(friend) {
     avatar.className =
         "message-avatar";
 
+
     const name =
         friend.display_name ||
         friend.username ||
         "Unknown";
 
+
     if (friend.avatar_url) {
+
         avatar.style.backgroundImage =
             `url("${friend.avatar_url}")`;
 
@@ -246,13 +313,19 @@ function createConversation(friend) {
 
         avatar.style.backgroundPosition =
             "center";
+
     } else {
+
         avatar.textContent =
-            name.charAt(0).toUpperCase();
+            name
+                .charAt(0)
+                .toUpperCase();
     }
+
 
     const info =
         document.createElement("div");
+
 
     const username =
         document.createElement("strong");
@@ -260,11 +333,13 @@ function createConversation(friend) {
     username.textContent =
         name;
 
+
     const status =
         document.createElement("span");
 
     status.textContent =
         "🟢 Online";
+
 
     info.appendChild(username);
     info.appendChild(status);
@@ -272,37 +347,50 @@ function createConversation(friend) {
     item.appendChild(avatar);
     item.appendChild(info);
 
+
     item.addEventListener(
         "click",
         () => openChat(friend)
     );
 
+
     conversationList.appendChild(item);
 }
 
-/* OPEN CHAT */
+
+/* =========================
+   OPEN CHAT
+========================= */
+
 async function openChat(friend) {
-    receiverId = friend.id;
+
+    receiverId =
+        friend.id;
+
 
     console.log(
         "💬 OPENING CHAT:",
         friend.id
     );
 
+
+    const name =
+        friend.display_name ||
+        friend.username ||
+        "Unknown";
+
+
     if (messageUsername) {
+
         messageUsername.textContent =
-            friend.display_name ||
-            friend.username ||
-            "Unknown";
+            name;
     }
 
+
     if (messageAvatar) {
-        const name =
-            friend.display_name ||
-            friend.username ||
-            "?";
 
         if (friend.avatar_url) {
+
             messageAvatar.textContent = "";
 
             messageAvatar.style.backgroundImage =
@@ -313,7 +401,9 @@ async function openChat(friend) {
 
             messageAvatar.style.backgroundPosition =
                 "center";
+
         } else {
+
             messageAvatar.style.backgroundImage =
                 "";
 
@@ -324,27 +414,45 @@ async function openChat(friend) {
         }
     }
 
+
     document.querySelector(
         ".messages-list-section"
-    ).style.display = "none";
+    ).style.display =
+        "none";
+
 
     document.getElementById(
         "messages-default-header"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
-    chatView.style.display = "block";
+
+    chatView.style.display =
+        "block";
+
 
     await loadMessages();
 }
 
-/* LOAD MESSAGES */
+
+/* =========================
+   LOAD MESSAGES
+========================= */
+
 async function loadMessages() {
-    if (!chatArea || !currentUser || !receiverId) {
+
+    if (
+        !chatArea ||
+        !currentUser ||
+        !receiverId
+    ) {
         return;
     }
 
+
     chatArea.innerHTML =
         "<div class='empty-box'>Loading messages...</div>";
+
 
     const {
         data,
@@ -372,7 +480,9 @@ async function loadMessages() {
             }
         );
 
+
     if (error) {
+
         console.error(
             "❌ MESSAGE LOAD ERROR:",
             error
@@ -384,39 +494,61 @@ async function loadMessages() {
         return;
     }
 
+
     chatArea.innerHTML = "";
 
-    if (!data || data.length === 0) {
-        chatArea.innerHTML =
-            "<div class='empty-chat'>" +
-            "<div class='empty-chat-icon'>💬</div>" +
-            "<h2>No messages yet</h2>" +
-            "<p>Send a message to start the conversation!</p>" +
-            "</div>";
+
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        chatArea.innerHTML = `
+            <div class="empty-chat">
+                <div class="empty-chat-icon">💬</div>
+                <h2>No messages yet</h2>
+                <p>Send a message to start the conversation!</p>
+            </div>
+        `;
 
         return;
     }
 
-    data.forEach(addMessage);
+
+    data.forEach(
+        addMessage
+    );
+
 
     chatArea.scrollTop =
         chatArea.scrollHeight;
 }
 
-/* DISPLAY MESSAGE */
+
+/* =========================
+   DISPLAY MESSAGE
+========================= */
+
 function addMessage(message) {
+
     const article =
         document.createElement("article");
 
+
     article.className =
-        message.sender_id === currentUser.id
+        message.sender_id ===
+            currentUser.id
+
             ? "message message-own"
+
             : "message";
+
 
     const username =
         message.sender?.display_name ||
         message.sender?.username ||
         "Unknown";
+
 
     const name =
         document.createElement("strong");
@@ -424,21 +556,30 @@ function addMessage(message) {
     name.textContent =
         username;
 
+
     const content =
         document.createElement("span");
 
     content.textContent =
         message.content;
 
+
     article.appendChild(name);
     article.appendChild(content);
+
 
     chatArea.appendChild(article);
 }
 
-/* SEND MESSAGE */
+
+/* =========================
+   SEND MESSAGE
+========================= */
+
 async function sendMessage(event) {
+
     event.preventDefault();
+
 
     if (
         !currentUser ||
@@ -448,14 +589,19 @@ async function sendMessage(event) {
         return;
     }
 
+
     const content =
         messageInput.value.trim();
+
 
     if (!content) {
         return;
     }
 
-    messageInput.disabled = true;
+
+    messageInput.disabled =
+        true;
+
 
     const {
         data,
@@ -463,9 +609,14 @@ async function sendMessage(event) {
     } = await supabase
         .from("messages")
         .insert({
-            sender_id: currentUser.id,
-            receiver_id: receiverId,
-            content: content
+            sender_id:
+                currentUser.id,
+
+            receiver_id:
+                receiverId,
+
+            content:
+                content
         })
         .select(`
             id,
@@ -480,44 +631,65 @@ async function sendMessage(event) {
         `)
         .single();
 
+
     if (error) {
+
         console.error(
             "❌ MESSAGE SEND ERROR:",
             error
         );
 
-        messageInput.disabled = false;
+        messageInput.disabled =
+            false;
+
         return;
     }
 
+
     messageInput.value = "";
 
+
     addMessage(data);
+
 
     chatArea.scrollTop =
         chatArea.scrollHeight;
 
-    messageInput.disabled = false;
+
+    messageInput.disabled =
+        false;
+
     messageInput.focus();
 }
 
-/* BACK */
+
+/* =========================
+   BACK BUTTON
+========================= */
+
 if (backButton) {
+
     backButton.addEventListener(
         "click",
         () => {
+
             receiverId = null;
 
             chatView.style.display =
                 "none";
 
+
             document.querySelector(
                 ".messages-list-section"
-            ).style.display = "";
+            ).style.display =
+                "";
+
 
             document.getElementById(
                 "messages-default-header"
-            ).style.display = "";
+            ).style.display =
+                "";
+
 
             if (messageInput) {
                 messageInput.value = "";
@@ -526,29 +698,46 @@ if (backButton) {
     );
 }
 
-/* SEND */
+
+/* =========================
+   SEND FORM
+========================= */
+
 if (messageForm) {
+
     messageForm.addEventListener(
         "submit",
         sendMessage
     );
 }
 
-/* LOGOUT */
+
+/* =========================
+   LOGOUT
+========================= */
+
 if (logoutButton) {
+
     logoutButton.addEventListener(
         "click",
         async () => {
-            const { error } =
+
+            const {
+                error
+            } =
                 await supabase.auth.signOut();
 
+
             if (error) {
+
                 console.error(
                     "LOGOUT ERROR:",
                     error
                 );
+
                 return;
             }
+
 
             window.location.href =
                 "login.html";
@@ -556,14 +745,31 @@ if (logoutButton) {
     );
 }
 
-/* START */
-console.log("🚀 STARTING MESSAGES PAGE...");
 
-const loggedIn = await loadUser();
+/* =========================
+   START
+========================= */
 
-console.log("✅ LOAD USER FINISHED:", loggedIn);
+console.log(
+    "🚀 STARTING MESSAGES PAGE..."
+);
+
+
+const loggedIn =
+    await loadUser();
+
+
+console.log(
+    "✅ LOAD USER FINISHED:",
+    loggedIn
+);
+
 
 if (loggedIn) {
-    console.log("👥 STARTING FRIEND LOAD...");
+
+    console.log(
+        "👥 STARTING FRIEND LOAD..."
+    );
+
     await loadFriends();
 }
