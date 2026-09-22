@@ -2,6 +2,8 @@ import { supabase } from "./supabase.js";
 
 console.log("🔥 UNDERNET MESSAGES.JS LOADED");
 
+console.log("1️⃣ GETTING ELEMENTS");
+
 const conversationList =
     document.getElementById("conversation-list");
 
@@ -35,12 +37,43 @@ const navAvatar =
 const logoutButton =
     document.getElementById("logout-button");
 
+console.log("2️⃣ ELEMENTS DONE");
+
 let currentUser = null;
 let receiverId = null;
+
+console.log("3️⃣ VARIABLES DONE");
 
 /* LOAD USER */
 async function loadUser() {
     console.log("🔍 STARTING LOAD USER...");
+
+    const {
+        data: { user },
+        error
+    } = await supabase.auth.getUser();
+
+    console.log("🔐 AUTH CHECK FINISHED");
+
+    if (error || !user) {
+        window.location.href = "login.html";
+        return false;
+    }
+
+    currentUser = user;
+
+    console.log("👤 LOGGED IN:", user.id);
+
+    return true;
+}
+
+console.log("4️⃣ LOAD USER FUNCTION CREATED");
+
+console.log("🚀 STARTING MESSAGES PAGE...");
+
+const loggedIn = await loadUser();
+
+console.log("✅ LOAD USER FINISHED:", loggedIn);
     
     const {
         data: { user },
