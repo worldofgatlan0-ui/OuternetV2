@@ -522,9 +522,13 @@ if (logoutButton) {
 }
 
 /* START */
-const loggedIn =
-    await loadUser();
+console.log("🚀 STARTING MESSAGES PAGE...");
+
+const loggedIn = await loadUser();
+
+console.log("✅ LOAD USER FINISHED:", loggedIn);
 
 if (loggedIn) {
+    console.log("👥 STARTING FRIEND LOAD...");
     await loadFriends();
 }
