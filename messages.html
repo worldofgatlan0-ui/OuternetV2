@@ -55,17 +55,12 @@
     <nav class="nav-zone">
 
         <div class="menu-indicator">
-
             <span></span>
             <span></span>
             <span></span>
-
         </div>
 
-
         <div class="nav-panel">
-
-            <!-- PROFILE -->
 
             <div class="nav-profile">
 
@@ -90,8 +85,6 @@
 
             </div>
 
-
-            <!-- NAVIGATION -->
 
             <div class="nav-links">
 
@@ -122,12 +115,9 @@
             </div>
 
 
-            <!-- SERVERS -->
-
             <div class="nav-heading">
                 SERVERS
             </div>
-
 
             <div class="server-list">
 
@@ -157,7 +147,6 @@
 
             </div>
 
-
             <button
                 type="button"
                 class="add-server"
@@ -165,8 +154,6 @@
                 ＋ Add Server
             </button>
 
-
-            <!-- BOTTOM NAV -->
 
             <div class="nav-bottom">
 
@@ -208,51 +195,15 @@
 
         <div class="messages-page">
 
-            <!-- CONVERSATION HEADER -->
 
-            <div class="messages-header">
+            <!-- DEFAULT HEADER -->
 
-                <button
-                    type="button"
-                    class="back-button"
-                    onclick="window.location.href='friends.html'"
-                >
-                    ← Friends
-                </button>
+            <div
+                class="messages-header"
+                id="messages-default-header"
+            >
 
-
-                <div
-                    class="message-user"
-                    id="message-user"
-                    style="display: none;"
-                >
-
-                    <div
-                        class="message-avatar"
-                        id="message-avatar"
-                    >
-                        ?
-                    </div>
-
-                    <div>
-
-                        <h1 id="message-username">
-                            Loading...
-                        </h1>
-
-                        <span>
-                            🟢 Online
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <div
-                    class="message-user"
-                    id="messages-default-header"
-                >
+                <div class="message-user">
 
                     <div class="message-avatar">
                         💬
@@ -275,56 +226,117 @@
             </div>
 
 
-            <!-- CHAT -->
+            <!-- FRIENDS / CONVERSATIONS -->
 
-            <div
-                class="chat-area"
-                id="chat-area"
-            >
+            <section class="messages-list-section">
 
-                <div class="empty-chat">
+                <h2>
+                    Your Friends
+                </h2>
 
-                    <div class="empty-chat-icon">
-                        💬
+                <div
+                    id="conversation-list"
+                    class="conversation-list"
+                >
+
+                    <div class="empty-box">
+                        Loading friends...
                     </div>
-
-                    <h2>
-                        Select a friend
-                    </h2>
-
-                    <p>
-                        Choose a friend from your Friends list
-                        to start messaging.
-                    </p>
 
                 </div>
 
-            </div>
+            </section>
 
 
-            <!-- MESSAGE FORM -->
+            <!-- ACTIVE CHAT -->
 
-            <form
-                id="message-form"
-                class="message-form"
+            <div
+                id="chat-view"
                 style="display: none;"
             >
 
-                <input
-                    id="message-input"
-                    name="message"
-                    type="text"
-                    placeholder="Type a message..."
-                    maxlength="2000"
-                    autocomplete="off"
-                    required
+                <div class="messages-header">
+
+                    <button
+                        type="button"
+                        class="back-button"
+                        id="back-to-messages"
+                    >
+                        ← Messages
+                    </button>
+
+                    <div class="message-user">
+
+                        <div
+                            class="message-avatar"
+                            id="message-avatar"
+                        >
+                            ?
+                        </div>
+
+                        <div>
+
+                            <h1 id="message-username">
+                                Loading...
+                            </h1>
+
+                            <span>
+                                🟢 Online
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="chat-area"
+                    id="chat-area"
                 >
 
-                <button type="submit">
-                    Send
-                </button>
+                    <div class="empty-chat">
 
-            </form>
+                        <div class="empty-chat-icon">
+                            💬
+                        </div>
+
+                        <h2>
+                            No messages yet
+                        </h2>
+
+                        <p>
+                            Send a message to start the conversation!
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <form
+                    id="message-form"
+                    class="message-form"
+                >
+
+                    <input
+                        id="message-input"
+                        name="message"
+                        type="text"
+                        placeholder="Type a message..."
+                        maxlength="2000"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <button type="submit">
+                        Send
+                    </button>
+
+                </form>
+
+            </div>
 
         </div>
 
@@ -333,13 +345,10 @@
 </div>
 
 
-<!-- SUPABASE / MESSAGES -->
-
 <script
     type="module"
     src="messages.js"
 ></script>
 
 </body>
-
 </html>
