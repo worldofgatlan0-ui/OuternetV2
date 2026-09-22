@@ -1,30 +1,15 @@
 import { supabase } from "./supabase.js";
 
-console.log("UNDERNET FRIENDS.JS LOADED");
+console.log("🔥 FRIENDS.JS LOADED");
 
-const searchForm =
-    document.getElementById("friend-search-form");
-
-const searchInput =
-    document.getElementById("friend-search-input");
-
-const searchResults =
-    document.getElementById("search-results");
-
-const searchResultsSection =
-    document.getElementById("search-results-section");
-
-const friendList =
-    document.getElementById("friend-list");
-
-const notice =
-    document.getElementById("friend-notice");
-
-const navUsername =
-    document.getElementById("nav-username");
-
-const navAvatar =
-    document.getElementById("nav-avatar");
+const searchForm = document.getElementById("friend-search-form");
+const searchInput = document.getElementById("friend-search-input");
+const searchResults = document.getElementById("search-results");
+const searchResultsSection = document.getElementById("search-results-section");
+const friendList = document.getElementById("friend-list");
+const notice = document.getElementById("friend-notice");
+const navUsername = document.getElementById("nav-username");
+const navAvatar = document.getElementById("nav-avatar");
 
 let currentUser = null;
 
@@ -48,18 +33,25 @@ async function loadUser() {
     } = await supabase.auth.getUser();
 
     if (error || !user) {
+        console.error("AUTH ERROR:", error);
         window.location.href = "login.html";
         return false;
     }
 
     currentUser = user;
 
-    const { data: profile } =
+    console.log("👤 LOGGED IN:", currentUser.id);
+
+    const { data: profile, error: profileError } =
         await supabase
             .from("profiles")
             .select("username, display_name, avatar_url")
             .eq("id", user.id)
             .maybeSingle();
+
+    if (profileError) {
+        console.error("PROFILE ERROR:", profileError);
+    }
 
     const username =
         profile?.display_name ||
@@ -90,15 +82,16 @@ async function loadUser() {
 
 /* CREATE USER CARD */
 function createUserCard(profile, isFriend = false) {
-    const card =
-        document.createElement("div");
-
+    const card = document.createElement("div");
     card.className = "friend-card";
 
-    const avatar =
-        document.createElement("div");
-
+    const avatar = document.createElement("div");
     avatar.className = "friend-avatar";
+
+    const displayName =
+        profile.display_name ||
+        profile.username ||
+        "Unknown";
 
     if (profile.avatar_url) {
         avatar.style.backgroundImage =
@@ -107,40 +100,25 @@ function createUserCard(profile, isFriend = false) {
         avatar.style.backgroundPosition = "center";
     } else {
         avatar.textContent =
-            (
-                profile.display_name ||
-                profile.username ||
-                "?"
-            )
-            .charAt(0)
-            .toUpperCase();
+            displayName.charAt(0).toUpperCase();
     }
 
-    const info =
-        document.createElement("div");
-
+    const info = document.createElement("div");
     info.className = "friend-info";
 
-    const name =
-        document.createElement("strong");
+    const name = document.createElement("strong");
+    name.textContent = displayName;
 
-    name.textContent =
-        profile.display_name ||
-        profile.username ||
-        "Unknown";
-
-    const username =
-        document.createElement("span");
-
+    const username = document.createElement("span");
     username.textContent =
-        "@" + profile.username;
+        profile.username
+            ? "@" + profile.username
+            : "";
 
     info.appendChild(name);
     info.appendChild(username);
 
-    const actions =
-        document.createElement("div");
-
+    const actions = document.createElement("div");
     actions.className = "friend-actions";
 
     if (isFriend) {
@@ -150,14 +128,16 @@ function createUserCard(profile, isFriend = false) {
         messageButton.type = "button";
         messageButton.textContent = "MESSAGE";
 
-        messageButton.addEventListener(
-            "click",
-            () => {
-                window.location.href =
-                    "messages.html?user=" +
-                    encodeURIComponent(profile.id);
-            }
-        );
+        messageButton.addEventListener("click", () => {
+            console.log(
+                "💬 OPENING DM WITH:",
+                profile.id
+            );
+
+            window.location.href =
+                "messages.html?user=" +
+                encodeURIComponent(profile.id);
+        });
 
         actions.appendChild(messageButton);
 
@@ -168,10 +148,9 @@ function createUserCard(profile, isFriend = false) {
         addButton.type = "button";
         addButton.textContent = "ADD FRIEND";
 
-        addButton.addEventListener(
-            "click",
-            () => addFriend(profile.id, addButton)
-        );
+        addButton.addEventListener("click", () => {
+            addFriend(profile.id, addButton);
+        });
 
         actions.appendChild(addButton);
     }
@@ -187,13 +166,16 @@ function createUserCard(profile, isFriend = false) {
 async function searchUsers(event) {
     event.preventDefault();
 
+    if (!currentUser) return;
+
     const query =
-        searchInput.value.trim();
+        searchInput?.value.trim();
 
     if (!query) return;
 
-    searchResultsSection.style.display =
-        "block";
+    console.log("🔎 SEARCHING FOR:", query);
+
+    searchResultsSection.style.display = "block";
 
     searchResults.innerHTML =
         "<div class='empty-box'>Searching...</div>";
@@ -218,7 +200,7 @@ async function searchUsers(event) {
 
     if (error) {
         console.error(
-            "SEARCH ERROR:",
+            "❌ SEARCH ERROR:",
             error
         );
 
@@ -227,6 +209,8 @@ async function searchUsers(event) {
 
         return;
     }
+
+    console.log("🔎 SEARCH RESULTS:", data);
 
     searchResults.innerHTML = "";
 
@@ -239,7 +223,7 @@ async function searchUsers(event) {
 
     data.forEach((profile) => {
         searchResults.appendChild(
-            createUserCard(profile)
+            createUserCard(profile, false)
         );
     });
 }
@@ -247,6 +231,11 @@ async function searchUsers(event) {
 /* ADD FRIEND */
 async function addFriend(friendId, button) {
     if (!currentUser) return;
+
+    console.log(
+        "➕ ADDING FRIEND:",
+        friendId
+    );
 
     button.disabled = true;
     button.textContent = "ADDING...";
@@ -261,7 +250,7 @@ async function addFriend(friendId, button) {
 
     if (error) {
         console.error(
-            "ADD FRIEND ERROR:",
+            "❌ ADD FRIEND ERROR:",
             error
         );
 
@@ -274,6 +263,8 @@ async function addFriend(friendId, button) {
 
         return;
     }
+
+    console.log("✅ FRIEND ADDED");
 
     button.textContent =
         "ADDED ✓";
@@ -304,9 +295,15 @@ async function loadFriends() {
             `user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`
         );
 
+    console.log(
+        "👥 FRIENDSHIPS:",
+        friendships,
+        error
+    );
+
     if (error) {
         console.error(
-            "FRIENDS LOAD ERROR:",
+            "❌ FRIENDS LOAD ERROR:",
             error
         );
 
@@ -324,11 +321,21 @@ async function loadFriends() {
     }
 
     const friendIds =
-        friendships.map((friendship) =>
-            friendship.user1_id === currentUser.id
-                ? friendship.user2_id
-                : friendship.user1_id
-        );
+        friendships.map((friendship) => {
+            if (
+                friendship.user1_id ===
+                currentUser.id
+            ) {
+                return friendship.user2_id;
+            }
+
+            return friendship.user1_id;
+        });
+
+    console.log(
+        "🆔 FRIEND IDS:",
+        friendIds
+    );
 
     const {
         data: profiles,
@@ -338,14 +345,22 @@ async function loadFriends() {
         .select(
             "id, username, display_name, avatar_url"
         )
-        .in("id", friendIds);
-
-    if (profileError) {
-        console.error(
-            "FRIEND PROFILE ERROR:",
-            profileError
+        .in(
+            "id",
+            friendIds
         );
 
+    console.log(
+        "👤 FRIEND PROFILES:",
+        profiles
+    );
+
+    console.log(
+        "⚠️ PROFILE ERROR:",
+        profileError
+    );
+
+    if (profileError) {
         friendList.innerHTML =
             "<div class='empty-box'>Could not load friend profiles.</div>";
 
@@ -354,18 +369,34 @@ async function loadFriends() {
 
     friendList.innerHTML = "";
 
+    if (!profiles || profiles.length === 0) {
+        friendList.innerHTML =
+            "<div class='empty-box'>Friend profiles could not be found.</div>";
+
+        return;
+    }
+
     profiles.forEach((profile) => {
         friendList.appendChild(
-            createUserCard(profile, true)
+            createUserCard(
+                profile,
+                true
+            )
         );
     });
 }
 
 /* EVENTS */
 if (searchForm) {
+    console.log("✅ SEARCH FORM FOUND");
+
     searchForm.addEventListener(
         "submit",
         searchUsers
+    );
+} else {
+    console.error(
+        "❌ SEARCH FORM NOT FOUND"
     );
 }
 
