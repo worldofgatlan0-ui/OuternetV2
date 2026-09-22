@@ -1,9 +1,9 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
@@ -13,7 +13,7 @@
 
     <link
         rel="stylesheet"
-        href="../static/style.css"
+        href="style.css"
     >
 
     <style>
@@ -40,14 +40,21 @@
             <div class="auth-content">
 
                 <div class="auth-logo">
-                    <div class="auth-symbol">✦</div>
 
-                    <h1>UNDERNET</h1>
+                    <div class="auth-symbol">
+                        ✦
+                    </div>
+
+                    <h1>
+                        UNDERNET
+                    </h1>
 
                     <p class="auth-subtitle">
                         CONNECT TO THE NETWORK
                     </p>
+
                 </div>
+
 
                 <form
                     id="login-form"
@@ -67,6 +74,7 @@
                         required
                     >
 
+
                     <label for="password">
                         Password
                     </label>
@@ -80,24 +88,33 @@
                         required
                     >
 
+
                     <button type="submit">
                         LOG IN
                     </button>
 
                 </form>
 
+
                 <div class="auth-divider">
-                    <span>NEW TO THE NETWORK?</span>
+                    <span>
+                        NEW TO THE NETWORK?
+                    </span>
                 </div>
 
+
                 <div class="auth-footer">
+
                     Don't have an account?
+
                     <a href="register.html">
                         Create one
                     </a>
+
                 </div>
 
             </div>
+
 
             <div
                 id="error"
@@ -111,11 +128,12 @@
 
     </main>
 
+
     <script
         type="module"
-        src="../js/auth.js"
+        src="auth.js"
     ></script>
 
 </body>
+
 </html>
-```
