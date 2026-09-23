@@ -215,7 +215,7 @@ async function loadMessages() {
             id,
             server,
             sender_id,
-            context,
+            content,
             created_at
         `)
         .eq(
@@ -312,8 +312,6 @@ async function addMessage(
     if (!messageList) return;
 
 
-    /* GET SENDER PROFILE */
-
     const {
         data: profile,
         error: profileError
@@ -346,8 +344,6 @@ async function addMessage(
         "Unknown";
 
 
-    /* MESSAGE */
-
     const messageElement =
         document.createElement("div");
 
@@ -366,8 +362,6 @@ async function addMessage(
 
     }
 
-
-    /* AVATAR */
 
     const avatar =
         document.createElement("div");
@@ -397,16 +391,12 @@ async function addMessage(
     }
 
 
-    /* CONTENT */
-
     const content =
         document.createElement("div");
 
     content.className =
         "message-content";
 
-
-    /* AUTHOR */
 
     const author =
         document.createElement("strong");
@@ -415,16 +405,12 @@ async function addMessage(
         username;
 
 
-    /* TEXT */
-
     const text =
         document.createElement("p");
 
     text.textContent =
-        message.context;
+        message.content;
 
-
-    /* TIME */
 
     const time =
         document.createElement("small");
@@ -504,7 +490,7 @@ async function sendMessage() {
                 sender_id:
                     currentUser.id,
 
-                context:
+                content:
                     text
 
             })
