@@ -1861,3 +1861,41 @@ body.falling-stars::after {
 .message-form input {
     flex: 1;
 }
+
+/* ============================= */
+/* MESSAGES PAGE SCROLL FIX       */
+/* ============================= */
+
+html,
+body {
+    min-height: 100%;
+    overflow-y: auto;
+}
+
+.messages-page {
+    min-height: calc(100vh - 80px);
+    height: auto;
+    overflow: visible;
+}
+
+.messages-list-section {
+    overflow: visible;
+}
+
+#chat-view {
+    min-height: calc(100vh - 140px);
+    height: auto;
+    overflow: visible;
+}
+
+#chat-area {
+    max-height: 55vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#message-form {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+}
