@@ -573,128 +573,151 @@ function addMessage(message) {
 
 
 /* =========================
-   SEND MESSAGE
+   DISPLAY MESSAGE
 ========================= */
 
-async function sendMessage(event) {
+function addMessage(message, showDate = true) {
 
-    event.preventDefault();
+    const article =
+        document.createElement("article");
 
-    if (
-        !currentUser ||
-        !receiverId ||
-        !messageInput
-    ) {
-        return;
+    const isOwn =
+        message.sender_id === currentUser.id;
+
+    article.className =
+        isOwn
+            ? "message message-own"
+            : "message";
+
+
+    /* =========================
+       DATE
+    ========================= */
+
+    if (showDate && message.created_at) {
+
+        const date =
+            new Date(message.created_at);
+
+        const dateLabel =
+            document.createElement("div");
+
+        dateLabel.className =
+            "message-date";
+
+        const now =
+            new Date();
+
+        const today =
+            date.toDateString() ===
+            now.toDateString();
+
+        const yesterday =
+            new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() - 1
+            ).toDateString();
+
+        if (today) {
+
+            dateLabel.textContent =
+                "Today";
+
+        } else if (
+            date.toDateString() === yesterday
+        ) {
+
+            dateLabel.textContent =
+                "Yesterday";
+
+        } else {
+
+            dateLabel.textContent =
+                date.toLocaleDateString(
+                    undefined,
+                    {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric"
+                    }
+                );
+        }
+
+        chatArea.appendChild(
+            dateLabel
+        );
     }
+
+
+    /* =========================
+       BUBBLE
+    ========================= */
+
+    const bubble =
+        document.createElement("div");
+
+    bubble.className =
+        "message-bubble";
+
+
+    /* =========================
+       CONTENT
+    ========================= */
 
     const content =
-        messageInput.value.trim();
+        document.createElement("span");
 
-    if (!content) {
-        return;
-    }
+    content.className =
+        "message-content";
 
-    messageInput.disabled = true;
-
-    console.log(
-        "🧑 CURRENT USER ID:",
-        currentUser.id
-    );
-
-    console.log(
-        "🎯 RECEIVER ID:",
-        receiverId
-    );
-
-    const {
-        data: { session }
-    } = await supabase.auth.getSession();
-
-    console.log(
-        "🔐 SESSION USER ID:",
-        session?.user?.id
-    );
-
-    console.log(
-        "🔐 AUTHENTICATED:",
-        !!session
-    );
+    content.textContent =
+        message.content;
 
 
     /* =========================
-       INSERT MESSAGE
+       TIME
     ========================= */
 
-    const {
-        data: insertedMessage,
-        error
-    } = await supabase
-        .from("messages")
-        .insert({
-            sender_id: currentUser.id,
-            receiver_id: receiverId,
-            content: content
-        })
-        .select(`
-            id,
-            content,
-            created_at,
-            sender_id,
-            receiver_id
-        `)
-        .single();
+    const time =
+        document.createElement("time");
 
+    time.className =
+        "message-time";
 
-    if (error) {
+    if (message.created_at) {
 
-        console.error(
-            "❌ MESSAGE SEND ERROR:",
-            JSON.stringify(
-                error,
-                null,
-                2
-            )
-        );
-
-        messageInput.disabled = false;
-        return;
+        time.textContent =
+            new Date(
+                message.created_at
+            ).toLocaleTimeString(
+                undefined,
+                {
+                    hour: "numeric",
+                    minute: "2-digit"
+                }
+            );
     }
 
 
-    console.log(
-        "✅ MESSAGE SENT:",
-        insertedMessage
+    bubble.appendChild(
+        content
+    );
+
+    bubble.appendChild(
+        time
     );
 
 
-    /* =========================
-       CLEAR INPUT
-    ========================= */
-
-    messageInput.value = "";
+    article.appendChild(
+        bubble
+    );
 
 
-    /* =========================
-       SHOW MESSAGE IMMEDIATELY
-    ========================= */
-
-    addMessage(insertedMessage);
-
-
-    chatArea.scrollTop =
-        chatArea.scrollHeight;
-
-
-    /* =========================
-       ENABLE INPUT
-    ========================= */
-
-    messageInput.disabled = false;
-
-    messageInput.focus();
+    chatArea.appendChild(
+        article
+    );
 }
-
 
 /* =========================
    BACK BUTTON
