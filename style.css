@@ -1822,7 +1822,7 @@ body.falling-stars::after {
    SERVER HEADER
    ========================================================= */
 
-.server-chat-header {
+.server-chat .server-chat-header {
     flex-shrink: 0;
 
     padding: 22px 30px 18px;
@@ -1832,7 +1832,7 @@ body.falling-stars::after {
     border-bottom: 1px solid var(--border);
 }
 
-.server-chat-header a {
+.server-chat .server-chat-header a {
     color: var(--text-muted);
 
     font-size: 11px;
@@ -1841,18 +1841,18 @@ body.falling-stars::after {
     transition: var(--transition);
 }
 
-.server-chat-header a:hover {
+.server-chat .server-chat-header a:hover {
     color: var(--text);
 }
 
-.server-chat-header h1 {
+.server-chat .server-chat-header h1 {
     margin: 10px 0 4px;
 
     font-size: 20px;
     letter-spacing: 1px;
 }
 
-.server-chat-header p {
+.server-chat .server-chat-header p {
     margin: 0;
 
     color: var(--text-muted);
@@ -1862,10 +1862,10 @@ body.falling-stars::after {
 
 
 /* =========================================================
-   MESSAGE AREA
+   SERVER MESSAGE AREA
    ========================================================= */
 
-.message-list {
+.server-chat .message-list {
     flex: 1;
     min-height: 0;
 
@@ -1886,10 +1886,7 @@ body.falling-stars::after {
     border: 0;
 }
 
-
-/* EMPTY CHAT */
-
-.message-list > p {
+.server-chat .message-list > p {
     margin: auto;
 
     padding: 20px;
@@ -1903,10 +1900,10 @@ body.falling-stars::after {
 
 
 /* =========================================================
-   MESSAGE
+   SERVER MESSAGE
    ========================================================= */
 
-.message {
+.server-chat .message {
     width: 100%;
 
     display: flex;
@@ -1923,16 +1920,16 @@ body.falling-stars::after {
     transition: background var(--transition);
 }
 
-.message:hover {
+.server-chat .message:hover {
     background: rgba(255, 255, 255, 0.025);
 }
 
 
 /* =========================================================
-   MESSAGE AVATAR
+   SERVER MESSAGE AVATAR
    ========================================================= */
 
-.message-avatar {
+.server-chat .message-avatar {
     width: 40px;
     height: 40px;
 
@@ -1961,10 +1958,10 @@ body.falling-stars::after {
 
 
 /* =========================================================
-   MESSAGE CONTENT
+   SERVER MESSAGE CONTENT
    ========================================================= */
 
-.message-content {
+.server-chat .message-content {
     flex: 1;
     min-width: 0;
 
@@ -1974,7 +1971,7 @@ body.falling-stars::after {
     padding-top: 1px;
 }
 
-.message-content strong {
+.server-chat .message-content strong {
     display: block;
 
     margin: 0 0 3px;
@@ -1985,7 +1982,7 @@ body.falling-stars::after {
     font-weight: 700;
 }
 
-.message-content p {
+.server-chat .message-content p {
     margin: 0;
 
     color: var(--text-soft);
@@ -1998,7 +1995,7 @@ body.falling-stars::after {
     word-break: break-word;
 }
 
-.message-content small {
+.server-chat .message-content small {
     display: block;
 
     margin-top: 4px;
@@ -2012,23 +2009,20 @@ body.falling-stars::after {
     opacity: 0.75;
 }
 
-
-/* YOUR MESSAGES */
-
-.message-own {
+.server-chat .message-own {
     background: rgba(104, 117, 255, 0.035);
 }
 
-.message-own .message-content p {
+.server-chat .message-own .message-content p {
     color: #e5e7ff;
 }
 
 
 /* =========================================================
-   MESSAGE INPUT
+   SERVER MESSAGE INPUT
    ========================================================= */
 
-.message-form {
+.server-chat .message-form {
     width: 100%;
 
     flex-shrink: 0;
@@ -2045,7 +2039,7 @@ body.falling-stars::after {
     border-top: 1px solid var(--border);
 }
 
-.message-form input {
+.server-chat .message-form input {
     flex: 1;
     min-width: 0;
 
@@ -2067,18 +2061,18 @@ body.falling-stars::after {
     transition: var(--transition);
 }
 
-.message-form input::placeholder {
+.server-chat .message-form input::placeholder {
     color: var(--text-muted);
 }
 
-.message-form input:focus {
+.server-chat .message-form input:focus {
     border-color: rgba(104, 117, 255, 0.4);
 
     box-shadow:
         0 0 0 2px rgba(104, 117, 255, 0.07);
 }
 
-.message-form button {
+.server-chat .message-form button {
     height: 44px;
 
     padding: 0 22px;
@@ -2099,7 +2093,7 @@ body.falling-stars::after {
     transition: var(--transition);
 }
 
-.message-form button:hover {
+.server-chat .message-form button:hover {
     background: rgba(104, 117, 255, 0.23);
 
     border-color: rgba(104, 117, 255, 0.5);
@@ -2107,9 +2101,11 @@ body.falling-stars::after {
     transform: translateY(-1px);
 }
 
-.message-form button:disabled {
+.server-chat .message-form button:disabled {
     cursor: wait;
+
     opacity: 0.5;
+
     transform: none;
 }
 
@@ -2124,38 +2120,37 @@ body.falling-stars::after {
         height: calc(100vh - 64px);
     }
 
-    .server-chat-header {
+    .server-chat .server-chat-header {
         padding: 18px 16px 15px;
     }
 
-    .message-list {
+    .server-chat .message-list {
         padding: 14px 10px;
     }
 
-    .message {
+    .server-chat .message {
         gap: 9px;
 
         padding: 8px 7px;
     }
 
-    .message-avatar {
+    .server-chat .message-avatar {
         width: 36px;
         height: 36px;
 
         min-width: 36px;
     }
 
-    .message-form {
+    .server-chat .message-form {
         padding: 10px;
     }
 
-    .message-form input {
+    .server-chat .message-form input,
+    .server-chat .message-form button {
         height: 42px;
     }
 
-    .message-form button {
-        height: 42px;
-
+    .server-chat .message-form button {
         padding: 0 15px;
     }
 }
