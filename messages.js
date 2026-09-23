@@ -3,6 +3,11 @@ import { supabase } from "./supabase.js";
 console.log("🔥 UNDERNET MESSAGES.JS LOADED");
 console.log("🟢 SUPABASE IMPORTED");
 
+
+/* =========================
+   DOM ELEMENTS
+========================= */
+
 const conversationList =
     document.getElementById("conversation-list");
 
@@ -36,6 +41,11 @@ const navAvatar =
 const logoutButton =
     document.getElementById("logout-button");
 
+
+/* =========================
+   STATE
+========================= */
+
 let currentUser = null;
 let receiverId = null;
 
@@ -62,8 +72,7 @@ async function loadUser() {
             error
         );
 
-        window.location.href =
-            "login.html";
+        window.location.href = "login.html";
 
         return false;
     }
@@ -76,7 +85,9 @@ async function loadUser() {
     );
 
 
-    /* LOAD PROFILE */
+    /* =========================
+       LOAD PROFILE
+    ========================= */
 
     const {
         data: profile,
@@ -88,6 +99,7 @@ async function loadUser() {
         )
         .eq("id", user.id)
         .maybeSingle();
+
 
     if (profileError) {
 
@@ -105,7 +117,9 @@ async function loadUser() {
         "Unknown";
 
 
-    /* NAV USERNAME */
+    /* =========================
+       NAV USERNAME
+    ========================= */
 
     if (navUsername) {
 
@@ -114,7 +128,9 @@ async function loadUser() {
     }
 
 
-    /* NAV AVATAR */
+    /* =========================
+       NAV AVATAR
+    ========================= */
 
     if (navAvatar) {
 
@@ -142,6 +158,7 @@ async function loadUser() {
                     .toUpperCase();
         }
     }
+
 
     return true;
 }
@@ -415,27 +432,35 @@ async function openChat(friend) {
     }
 
 
-    document.querySelector(
-        ".messages-list-section"
-    ).style.display =
-        "none";
+    const listSection =
+        document.querySelector(
+            ".messages-list-section"
+        );
+
+    if (listSection) {
+        listSection.style.display = "none";
+    }
 
 
-    document.getElementById(
-        "messages-default-header"
-    ).style.display =
-        "none";
+    const defaultHeader =
+        document.getElementById(
+            "messages-default-header"
+        );
+
+    if (defaultHeader) {
+        defaultHeader.style.display = "none";
+    }
 
 
-    chatView.style.display =
-        "block";
+    if (chatView) {
+        chatView.style.display = "flex";
+    }
 
 
     await loadMessages();
 }
 
 
-```js
 /* =========================
    LOAD MESSAGES
 ========================= */
@@ -533,93 +558,53 @@ async function loadMessages() {
     let lastDate = null;
 
 
-    data.forEach(message => {
+    data.forEach(
+        (message) => {
 
-        const messageDate =
-            new Date(
-                message.created_at
-            ).toDateString();
-
-
-        const showDate =
-            messageDate !== lastDate;
+            const messageDate =
+                new Date(
+                    message.created_at
+                ).toDateString();
 
 
-        addMessage(
-            message,
-            showDate
-        );
+            const showDate =
+                messageDate !== lastDate;
 
 
-        lastDate =
-            messageDate;
-    });
+            addMessage(
+                message,
+                showDate
+            );
+
+
+            lastDate =
+                messageDate;
+        }
+    );
 
 
     chatArea.scrollTop =
         chatArea.scrollHeight;
 }
-```
 
 
 /* =========================
    DISPLAY MESSAGE
 ========================= */
 
-function addMessage(message) {
+function addMessage(
+    message,
+    showDate = false
+) {
 
     const article =
         document.createElement("article");
 
-
-    article.className =
-        message.sender_id ===
-            currentUser.id
-
-            ? "message message-own"
-
-            : "message";
-
-
-    const username =
-        message.sender?.display_name ||
-        message.sender?.username ||
-        "Unknown";
-
-
-    const name =
-        document.createElement("strong");
-
-    name.textContent =
-        username;
-
-
-    const content =
-        document.createElement("span");
-
-    content.textContent =
-        message.content;
-
-
-    article.appendChild(name);
-    article.appendChild(content);
-
-
-    chatArea.appendChild(article);
-}
-
-
-/* =========================
-   DISPLAY MESSAGE
-========================= */
-
-function addMessage(message, showDate = true) {
-
-    const article =
-        document.createElement("article");
 
     const isOwn =
-        message.sender_id === currentUser.id;
+        message.sender_id ===
+        currentUser.id;
+
 
     article.className =
         isOwn
@@ -628,26 +613,36 @@ function addMessage(message, showDate = true) {
 
 
     /* =========================
-       DATE
+       DATE SEPARATOR
     ========================= */
 
-    if (showDate && message.created_at) {
+    if (
+        showDate &&
+        message.created_at
+    ) {
 
         const date =
-            new Date(message.created_at);
+            new Date(
+                message.created_at
+            );
+
 
         const dateLabel =
             document.createElement("div");
 
+
         dateLabel.className =
             "message-date";
+
 
         const now =
             new Date();
 
+
         const today =
             date.toDateString() ===
             now.toDateString();
+
 
         const yesterday =
             new Date(
@@ -656,13 +651,15 @@ function addMessage(message, showDate = true) {
                 now.getDate() - 1
             ).toDateString();
 
+
         if (today) {
 
             dateLabel.textContent =
                 "Today";
 
         } else if (
-            date.toDateString() === yesterday
+            date.toDateString() ===
+            yesterday
         ) {
 
             dateLabel.textContent =
@@ -681,6 +678,7 @@ function addMessage(message, showDate = true) {
                 );
         }
 
+
         chatArea.appendChild(
             dateLabel
         );
@@ -694,40 +692,53 @@ function addMessage(message, showDate = true) {
     const bubble =
         document.createElement("div");
 
+
     bubble.className =
         "message-bubble";
 
 
     /* =========================
-       CONTENT
+       MESSAGE CONTENT
     ========================= */
 
     const content =
         document.createElement("span");
 
+
     content.className =
         "message-content";
+
 
     content.textContent =
         message.content;
 
 
     /* =========================
-       TIME
+       TIMESTAMP
     ========================= */
 
     const time =
         document.createElement("time");
 
+
     time.className =
         "message-time";
 
+
     if (message.created_at) {
 
-        time.textContent =
+        const date =
             new Date(
                 message.created_at
-            ).toLocaleTimeString(
+            );
+
+
+        time.dateTime =
+            message.created_at;
+
+
+        time.textContent =
+            date.toLocaleTimeString(
                 undefined,
                 {
                     hour: "numeric",
@@ -756,6 +767,98 @@ function addMessage(message, showDate = true) {
     );
 }
 
+
+/* =========================
+   SEND MESSAGE
+========================= */
+
+async function sendMessage(event) {
+
+    event.preventDefault();
+
+
+    if (
+        !currentUser ||
+        !receiverId ||
+        !messageInput
+    ) {
+        return;
+    }
+
+
+    const content =
+        messageInput.value.trim();
+
+
+    if (!content) {
+        return;
+    }
+
+
+    messageInput.disabled = true;
+
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabase
+            .from("messages")
+            .insert({
+                sender_id: currentUser.id,
+                receiver_id: receiverId,
+                content: content
+            })
+            .select(`
+                id,
+                content,
+                created_at,
+                sender_id,
+                receiver_id,
+                sender:profiles!messages_sender_id_fkey (
+                    username,
+                    display_name
+                )
+            `)
+            .single();
+
+
+        if (error) {
+
+            console.error(
+                "❌ SEND MESSAGE ERROR:",
+                error
+            );
+
+            return;
+        }
+
+
+        messageInput.value = "";
+
+
+        /* Add the new message immediately */
+
+        addMessage(
+            data,
+            false
+        );
+
+
+        chatArea.scrollTop =
+            chatArea.scrollHeight;
+
+
+    } finally {
+
+        messageInput.disabled = false;
+
+        messageInput.focus();
+    }
+}
+
+
 /* =========================
    BACK BUTTON
 ========================= */
@@ -768,23 +871,42 @@ if (backButton) {
 
             receiverId = null;
 
-            chatView.style.display =
-                "none";
+
+            if (chatView) {
+
+                chatView.style.display =
+                    "none";
+            }
 
 
-            document.querySelector(
-                ".messages-list-section"
-            ).style.display =
-                "";
+            const listSection =
+                document.querySelector(
+                    ".messages-list-section"
+                );
 
 
-            document.getElementById(
-                "messages-default-header"
-            ).style.display =
-                "";
+            if (listSection) {
+
+                listSection.style.display =
+                    "";
+            }
+
+
+            const defaultHeader =
+                document.getElementById(
+                    "messages-default-header"
+                );
+
+
+            if (defaultHeader) {
+
+                defaultHeader.style.display =
+                    "";
+            }
 
 
             if (messageInput) {
+
                 messageInput.value = "";
             }
         }
