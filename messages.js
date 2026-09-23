@@ -580,7 +580,6 @@ async function sendMessage(event) {
 
     event.preventDefault();
 
-
     if (
         !currentUser ||
         !receiverId ||
@@ -589,21 +588,14 @@ async function sendMessage(event) {
         return;
     }
 
-
     const content =
         messageInput.value.trim();
-
 
     if (!content) {
         return;
     }
 
-
-    messageInput.disabled =
-        true;
-
-
-    /* DEBUG AUTH */
+    messageInput.disabled = true;
 
     console.log(
         "🧑 CURRENT USER ID:",
@@ -630,31 +622,26 @@ async function sendMessage(event) {
     );
 
 
+    /* =========================
+       INSERT MESSAGE
+    ========================= */
+
     const {
-        data,
+        data: insertedMessage,
         error
     } = await supabase
         .from("messages")
         .insert({
-            sender_id:
-                currentUser.id,
-
-            receiver_id:
-                receiverId,
-
-            content:
-                content
+            sender_id: currentUser.id,
+            receiver_id: receiverId,
+            content: content
         })
         .select(`
             id,
             content,
             created_at,
             sender_id,
-            receiver_id,
-            sender:profiles!messages_sender_id_fkey (
-                username,
-                display_name
-            )
+            receiver_id
         `)
         .single();
 
@@ -670,25 +657,40 @@ async function sendMessage(event) {
             )
         );
 
-        messageInput.disabled =
-            false;
-
+        messageInput.disabled = false;
         return;
     }
 
 
+    console.log(
+        "✅ MESSAGE SENT:",
+        insertedMessage
+    );
+
+
+    /* =========================
+       CLEAR INPUT
+    ========================= */
+
     messageInput.value = "";
 
 
-    addMessage(data);
+    /* =========================
+       SHOW MESSAGE IMMEDIATELY
+    ========================= */
+
+    addMessage(insertedMessage);
 
 
     chatArea.scrollTop =
         chatArea.scrollHeight;
 
 
-    messageInput.disabled =
-        false;
+    /* =========================
+       ENABLE INPUT
+    ========================= */
+
+    messageInput.disabled = false;
 
     messageInput.focus();
 }
