@@ -77,13 +77,17 @@ const selectedServer =
     serverData[currentServer];
 
 if (serverName) {
+
     serverName.textContent =
         selectedServer.name;
+
 }
 
 if (serverDescription) {
+
     serverDescription.textContent =
         selectedServer.description;
+
 }
 
 
@@ -103,17 +107,29 @@ async function loadUser() {
         error
     } = await supabase.auth.getUser();
 
+
     if (error || !user) {
 
-        window.location.href = "login.html";
+        console.error(
+            "Failed to get logged-in user:",
+            error
+        );
+
+        window.location.href =
+            "login.html";
 
         return null;
+
     }
+
 
     currentUser = user;
 
 
-    const { data: profile } =
+    const {
+        data: profile,
+        error: profileError
+    } =
         await supabase
             .from("profiles")
             .select(
@@ -121,6 +137,16 @@ async function loadUser() {
             )
             .eq("id", user.id)
             .maybeSingle();
+
+
+    if (profileError) {
+
+        console.error(
+            "Failed to load profile:",
+            profileError
+        );
+
+    }
 
 
     const username =
@@ -131,8 +157,10 @@ async function loadUser() {
 
 
     if (navUsername) {
+
         navUsername.textContent =
             username;
+
     }
 
 
@@ -153,7 +181,8 @@ async function loadUser() {
 
         } else {
 
-            navAvatar.style.backgroundImage = "";
+            navAvatar.style.backgroundImage =
+                "";
 
             navAvatar.textContent =
                 username
@@ -161,10 +190,12 @@ async function loadUser() {
                     .toUpperCase();
 
         }
+
     }
 
 
     return user;
+
 }
 
 
@@ -187,35 +218,71 @@ async function loadMessages() {
             context,
             created_at
         `)
-        .eq("server", currentServer)
-        .order("created_at", {
-            ascending: true
-        });
+        .eq(
+            "server",
+            currentServer
+        )
+        .order(
+            "created_at",
+            {
+                ascending: true
+            }
+        );
 
 
     if (error) {
 
         console.error(
-            "Failed to load server messages:",
+            "FAILED TO LOAD SERVER MESSAGES"
+        );
+
+        console.error(
+            "Message:",
+            error.message
+        );
+
+        console.error(
+            "Details:",
+            error.details
+        );
+
+        console.error(
+            "Hint:",
+            error.hint
+        );
+
+        console.error(
+            "Code:",
+            error.code
+        );
+
+        console.error(
+            "Full error:",
             error
         );
+
 
         messageList.innerHTML =
             "<p>Failed to load messages.</p>";
 
         return;
+
     }
 
 
     messageList.innerHTML = "";
 
 
-    if (!messages || messages.length === 0) {
+    if (
+        !messages ||
+        messages.length === 0
+    ) {
 
         messageList.innerHTML =
             "<p>No messages yet. Be the first to say something!</p>";
 
         return;
+
     }
 
 
@@ -231,6 +298,7 @@ async function loadMessages() {
 
     messageList.scrollTop =
         messageList.scrollHeight;
+
 }
 
 
@@ -246,14 +314,30 @@ async function addMessage(
 
     /* GET SENDER PROFILE */
 
-    const { data: profile } =
+    const {
+        data: profile,
+        error: profileError
+    } =
         await supabase
             .from("profiles")
             .select(
                 "username, display_name, avatar_url"
             )
-            .eq("id", message.sender_id)
+            .eq(
+                "id",
+                message.sender_id
+            )
             .maybeSingle();
+
+
+    if (profileError) {
+
+        console.error(
+            "Failed to load sender profile:",
+            profileError
+        );
+
+    }
 
 
     const username =
@@ -261,6 +345,8 @@ async function addMessage(
         profile?.username ||
         "Unknown";
 
+
+    /* MESSAGE */
 
     const messageElement =
         document.createElement("div");
@@ -280,6 +366,8 @@ async function addMessage(
 
     }
 
+
+    /* AVATAR */
 
     const avatar =
         document.createElement("div");
@@ -309,12 +397,16 @@ async function addMessage(
     }
 
 
+    /* CONTENT */
+
     const content =
         document.createElement("div");
 
     content.className =
         "message-content";
 
+
+    /* AUTHOR */
 
     const author =
         document.createElement("strong");
@@ -323,6 +415,8 @@ async function addMessage(
         username;
 
 
+    /* TEXT */
+
     const text =
         document.createElement("p");
 
@@ -330,16 +424,21 @@ async function addMessage(
         message.context;
 
 
+    /* TIME */
+
     const time =
         document.createElement("small");
 
     time.textContent =
         new Date(
             message.created_at
-        ).toLocaleTimeString([], {
-            hour: "numeric",
-            minute: "2-digit"
-        });
+        ).toLocaleTimeString(
+            [],
+            {
+                hour: "numeric",
+                minute: "2-digit"
+            }
+        );
 
 
     content.appendChild(author);
@@ -362,6 +461,7 @@ async function addMessage(
             messageList.scrollHeight;
 
     }
+
 }
 
 
@@ -369,7 +469,16 @@ async function addMessage(
 
 async function sendMessage() {
 
-    if (!currentUser) return;
+    if (!currentUser) {
+
+        console.error(
+            "Cannot send message: no logged-in user."
+        );
+
+        return;
+
+    }
+
 
     const text =
         messageInput.value.trim();
@@ -381,12 +490,16 @@ async function sendMessage() {
     messageInput.disabled = true;
 
 
-    const { error } =
+    const {
+        data,
+        error
+    } =
         await supabase
             .from("server_messages")
             .insert({
 
-                server: currentServer,
+                server:
+                    currentServer,
 
                 sender_id:
                     currentUser.id,
@@ -394,20 +507,54 @@ async function sendMessage() {
                 context:
                     text
 
-            });
+            })
+            .select()
+            .single();
 
 
     if (error) {
 
         console.error(
-            "Failed to send message:",
+            "FAILED TO SEND SERVER MESSAGE"
+        );
+
+        console.error(
+            "Message:",
+            error.message
+        );
+
+        console.error(
+            "Details:",
+            error.details
+        );
+
+        console.error(
+            "Hint:",
+            error.hint
+        );
+
+        console.error(
+            "Code:",
+            error.code
+        );
+
+        console.error(
+            "Full error:",
             error
         );
+
 
         messageInput.disabled = false;
 
         return;
+
     }
+
+
+    console.log(
+        "MESSAGE SENT:",
+        data
+    );
 
 
     messageInput.value = "";
@@ -415,6 +562,7 @@ async function sendMessage() {
     messageInput.disabled = false;
 
     messageInput.focus();
+
 }
 
 
@@ -478,14 +626,17 @@ function subscribeToMessages() {
 
                 }
             )
-            .subscribe((status) => {
+            .subscribe(
+                (status) => {
 
-                console.log(
-                    "SERVER REALTIME:",
-                    status
-                );
+                    console.log(
+                        "SERVER REALTIME:",
+                        status
+                    );
 
-            });
+                }
+            );
+
 }
 
 
@@ -500,7 +651,9 @@ if (logoutButton) {
             logoutButton.disabled = true;
 
 
-            const { error } =
+            const {
+                error
+            } =
                 await supabase.auth.signOut();
 
 
@@ -511,9 +664,11 @@ if (logoutButton) {
                     error
                 );
 
-                logoutButton.disabled = false;
+                logoutButton.disabled =
+                    false;
 
                 return;
+
             }
 
 
