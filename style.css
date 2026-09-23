@@ -1899,3 +1899,138 @@ body {
     bottom: 0;
     z-index: 10;
 }
+
+/* =========================
+   CHAT BUBBLES
+========================= */
+
+#chat-area {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+}
+
+/* Individual message */
+
+.message {
+    display: flex;
+    width: 100%;
+    margin: 2px 0;
+}
+
+/* Friend messages = left */
+
+.message:not(.message-own) {
+    justify-content: flex-start;
+}
+
+/* Your messages = right */
+
+.message-own {
+    justify-content: flex-end;
+}
+
+
+/* =========================
+   BUBBLE
+========================= */
+
+.message-bubble {
+    display: flex;
+    flex-direction: column;
+
+    max-width: min(70%, 520px);
+
+    padding: 10px 14px;
+
+    border-radius: 16px;
+
+    background: #252535;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    box-shadow:
+        0 3px 8px rgba(0,0,0,0.18);
+}
+
+
+/* Your bubble */
+
+.message-own .message-bubble {
+    border-bottom-right-radius: 5px;
+}
+
+
+/* Friend bubble */
+
+.message:not(.message-own) .message-bubble {
+    border-bottom-left-radius: 5px;
+}
+
+
+/* =========================
+   MESSAGE TEXT
+========================= */
+
+.message-content {
+    font-size: 15px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+
+/* =========================
+   TIMESTAMP
+========================= */
+
+.message-time {
+    align-self: flex-end;
+
+    margin-top: 4px;
+
+    font-size: 10px;
+
+    opacity: 0.55;
+
+    white-space: nowrap;
+}
+
+
+/* =========================
+   DATE SEPARATOR
+========================= */
+
+.message-date {
+    align-self: center;
+
+    margin: 18px 0 8px;
+
+    padding: 5px 12px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+
+    opacity: 0.65;
+
+    background: rgba(255,255,255,0.06);
+
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+    .message-bubble {
+        max-width: 82%;
+    }
+
+    #chat-area {
+        padding: 12px;
+    }
+}
