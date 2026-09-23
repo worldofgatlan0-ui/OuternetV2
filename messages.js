@@ -435,6 +435,7 @@ async function openChat(friend) {
 }
 
 
+```js
 /* =========================
    LOAD MESSAGES
 ========================= */
@@ -505,9 +506,19 @@ async function loadMessages() {
 
         chatArea.innerHTML = `
             <div class="empty-chat">
-                <div class="empty-chat-icon">💬</div>
-                <h2>No messages yet</h2>
-                <p>Send a message to start the conversation!</p>
+
+                <div class="empty-chat-icon">
+                    💬
+                </div>
+
+                <h2>
+                    No messages yet
+                </h2>
+
+                <p>
+                    Send a message to start the conversation!
+                </p>
+
             </div>
         `;
 
@@ -515,14 +526,40 @@ async function loadMessages() {
     }
 
 
-    data.forEach(
-        addMessage
-    );
+    /* =========================
+       DISPLAY MESSAGES + DATES
+    ========================= */
+
+    let lastDate = null;
+
+
+    data.forEach(message => {
+
+        const messageDate =
+            new Date(
+                message.created_at
+            ).toDateString();
+
+
+        const showDate =
+            messageDate !== lastDate;
+
+
+        addMessage(
+            message,
+            showDate
+        );
+
+
+        lastDate =
+            messageDate;
+    });
 
 
     chatArea.scrollTop =
         chatArea.scrollHeight;
 }
+```
 
 
 /* =========================
