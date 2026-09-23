@@ -48,6 +48,7 @@ const logoutButton =
 
 let currentUser = null;
 let receiverId = null;
+let messageChannel = null;
 
 
 /* =========================
@@ -376,10 +377,215 @@ function createConversation(friend) {
 
 
 /* =========================
+   REALTIME MESSAGES
+========================= */
+
+function subscribeToMessages() {
+
+    if (
+        !currentUser ||
+        !receiverId
+    ) {
+        return;
+    }
+
+
+    console.log(
+        "📡 STARTING REALTIME:",
+        receiverId
+    );
+
+
+    /* Remove previous channel */
+
+    if (messageChannel) {
+
+        console.log(
+            "📡 REMOVING OLD REALTIME CHANNEL"
+        );
+
+        supabase.removeChannel(
+            messageChannel
+        );
+
+        messageChannel = null;
+    }
+
+
+    messageChannel =
+        supabase
+            .channel(
+                `messages-${currentUser.id}-${receiverId}`
+            )
+            .on(
+                "postgres_changes",
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "messages"
+                },
+                async (payload) => {
+
+                    const message =
+                        payload.new;
+
+
+                    console.log(
+                        "📨 REALTIME MESSAGE:",
+                        message
+                    );
+
+
+                    /*
+                       Only display messages
+                       belonging to this chat.
+                    */
+
+                    const isThisConversation =
+                        (
+                            message.sender_id ===
+                                receiverId &&
+                            message.receiver_id ===
+                                currentUser.id
+                        );
+
+
+                    if (!isThisConversation) {
+
+                        return;
+                    }
+
+
+                    /*
+                       Get the sender profile so
+                       the message has the same
+                       shape as normal messages.
+                    */
+
+                    const {
+                        data: sender,
+                        error
+                    } = await supabase
+                        .from("profiles")
+                        .select(
+                            "username, display_name"
+                        )
+                        .eq(
+                            "id",
+                            message.sender_id
+                        )
+                        .maybeSingle();
+
+
+                    if (error) {
+
+                        console.error(
+                            "❌ REALTIME PROFILE ERROR:",
+                            error
+                        );
+                    }
+
+
+                    message.sender =
+                        sender || null;
+
+
+                    /*
+                       Add the incoming message
+                       immediately.
+                    */
+
+                    addMessage(
+                        message,
+                        false
+                    );
+
+
+                    if (chatArea) {
+
+                        chatArea.scrollTop =
+                            chatArea.scrollHeight;
+                    }
+                }
+            )
+            .subscribe(
+                (status) => {
+
+                    console.log(
+                        "📡 REALTIME STATUS:",
+                        status
+                    );
+
+                    if (
+                        status ===
+                        "SUBSCRIBED"
+                    ) {
+
+                        console.log(
+                            "✅ REALTIME CONNECTED!"
+                        );
+                    }
+
+                    if (
+                        status ===
+                        "CHANNEL_ERROR"
+                    ) {
+
+                        console.error(
+                            "❌ REALTIME CHANNEL ERROR"
+                        );
+                    }
+
+                    if (
+                        status ===
+                        "TIMED_OUT"
+                    ) {
+
+                        console.error(
+                            "❌ REALTIME TIMED OUT"
+                        );
+                    }
+                }
+            );
+}
+
+
+/* =========================
+   STOP REALTIME
+========================= */
+
+function stopMessageRealtime() {
+
+    if (!messageChannel) {
+        return;
+    }
+
+
+    console.log(
+        "📡 STOPPING REALTIME"
+    );
+
+
+    supabase.removeChannel(
+        messageChannel
+    );
+
+
+    messageChannel =
+        null;
+}
+
+
+/* =========================
    OPEN CHAT
 ========================= */
 
 async function openChat(friend) {
+
+    /*
+       Set the person we're chatting with
+       BEFORE starting realtime.
+    */
 
     receiverId =
         friend.id;
@@ -397,12 +603,20 @@ async function openChat(friend) {
         "Unknown";
 
 
+    /* =========================
+       CHAT NAME
+    ========================= */
+
     if (messageUsername) {
 
         messageUsername.textContent =
             name;
     }
 
+
+    /* =========================
+       CHAT AVATAR
+    ========================= */
 
     if (messageAvatar) {
 
@@ -432,13 +646,20 @@ async function openChat(friend) {
     }
 
 
+    /* =========================
+       SHOW CHAT
+    ========================= */
+
     const listSection =
         document.querySelector(
             ".messages-list-section"
         );
 
+
     if (listSection) {
-        listSection.style.display = "none";
+
+        listSection.style.display =
+            "none";
     }
 
 
@@ -447,17 +668,33 @@ async function openChat(friend) {
             "messages-default-header"
         );
 
+
     if (defaultHeader) {
-        defaultHeader.style.display = "none";
+
+        defaultHeader.style.display =
+            "none";
     }
 
 
     if (chatView) {
-        chatView.style.display = "flex";
+
+        chatView.style.display =
+            "flex";
     }
 
 
+    /* =========================
+       LOAD OLD MESSAGES
+    ========================= */
+
     await loadMessages();
+
+
+    /* =========================
+       START LIVE MESSAGES
+    ========================= */
+
+    subscribeToMessages();
 }
 
 
@@ -596,6 +833,11 @@ function addMessage(
     message,
     showDate = false
 ) {
+
+    if (!chatArea || !currentUser) {
+        return;
+    }
+
 
     const article =
         document.createElement("article");
@@ -795,7 +1037,8 @@ async function sendMessage(event) {
     }
 
 
-    messageInput.disabled = true;
+    messageInput.disabled =
+        true;
 
 
     try {
@@ -838,7 +1081,13 @@ async function sendMessage(event) {
         messageInput.value = "";
 
 
-        /* Add the new message immediately */
+        /*
+           Add our own message immediately.
+
+           Realtime is only displaying messages
+           received from the other person, so
+           this won't duplicate our message.
+        */
 
         addMessage(
             data,
@@ -846,13 +1095,17 @@ async function sendMessage(event) {
         );
 
 
-        chatArea.scrollTop =
-            chatArea.scrollHeight;
+        if (chatArea) {
+
+            chatArea.scrollTop =
+                chatArea.scrollHeight;
+        }
 
 
     } finally {
 
-        messageInput.disabled = false;
+        messageInput.disabled =
+            false;
 
         messageInput.focus();
     }
@@ -869,7 +1122,16 @@ if (backButton) {
         "click",
         () => {
 
-            receiverId = null;
+            /*
+               Stop realtime when leaving
+               the conversation.
+            */
+
+            stopMessageRealtime();
+
+
+            receiverId =
+                null;
 
 
             if (chatView) {
@@ -936,6 +1198,13 @@ if (logoutButton) {
     logoutButton.addEventListener(
         "click",
         async () => {
+
+            /*
+               Clean up realtime before logout.
+            */
+
+            stopMessageRealtime();
+
 
             const {
                 error
