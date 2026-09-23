@@ -582,41 +582,23 @@ function stopMessageRealtime() {
 
 async function openChat(friend) {
 
-    /*
-       Set the person we're chatting with
-       BEFORE starting realtime.
-    */
-
     receiverId =
         friend.id;
-
 
     console.log(
         "💬 OPENING CHAT:",
         friend.id
     );
 
-
     const name =
         friend.display_name ||
         friend.username ||
         "Unknown";
 
-
-    /* =========================
-       CHAT NAME
-    ========================= */
-
     if (messageUsername) {
-
         messageUsername.textContent =
             name;
     }
-
-
-    /* =========================
-       CHAT AVATAR
-    ========================= */
 
     if (messageAvatar) {
 
@@ -645,54 +627,32 @@ async function openChat(friend) {
         }
     }
 
-
-    /* =========================
-       SHOW CHAT
-    ========================= */
-
     const listSection =
         document.querySelector(
             ".messages-list-section"
         );
 
-
     if (listSection) {
-
         listSection.style.display =
             "none";
     }
-
 
     const defaultHeader =
         document.getElementById(
             "messages-default-header"
         );
 
-
     if (defaultHeader) {
-
         defaultHeader.style.display =
             "none";
     }
 
-
     if (chatView) {
-
         chatView.style.display =
             "flex";
     }
 
-
-    /* =========================
-       LOAD OLD MESSAGES
-    ========================= */
-
     await loadMessages();
-
-
-    /* =========================
-       START LIVE MESSAGES
-    ========================= */
 
     subscribeToMessages();
 }
@@ -712,10 +672,8 @@ async function loadMessages() {
         return;
     }
 
-
     chatArea.innerHTML =
         "<div class='empty-box'>Loading messages...</div>";
-
 
     const {
         data,
@@ -743,9 +701,7 @@ async function loadMessages() {
             }
         );
 
-
     if (error) {
-
         console.error(
             "❌ MESSAGE LOAD ERROR:",
             error
@@ -757,9 +713,7 @@ async function loadMessages() {
         return;
     }
 
-
     chatArea.innerHTML = "";
-
 
     if (
         !data ||
@@ -768,7 +722,6 @@ async function loadMessages() {
 
         chatArea.innerHTML = `
             <div class="empty-chat">
-
                 <div class="empty-chat-icon">
                     💬
                 </div>
@@ -780,20 +733,13 @@ async function loadMessages() {
                 <p>
                     Send a message to start the conversation!
                 </p>
-
             </div>
         `;
 
         return;
     }
 
-
-    /* =========================
-       DISPLAY MESSAGES + DATES
-    ========================= */
-
     let lastDate = null;
-
 
     data.forEach(
         (message) => {
@@ -803,22 +749,18 @@ async function loadMessages() {
                     message.created_at
                 ).toDateString();
 
-
             const showDate =
                 messageDate !== lastDate;
-
 
             addMessage(
                 message,
                 showDate
             );
 
-
             lastDate =
                 messageDate;
         }
     );
-
 
     chatArea.scrollTop =
         chatArea.scrollHeight;
@@ -838,20 +780,25 @@ function addMessage(
         return;
     }
 
-
     const article =
         document.createElement("article");
-
 
     const isOwn =
         message.sender_id ===
         currentUser.id;
 
 
+    /*
+       IMPORTANT:
+       Use chat-message here instead of
+       message so the DM system does not
+       collide with the server chat styles.
+    */
+
     article.className =
         isOwn
-            ? "message message-own"
-            : "message";
+            ? "chat-message own"
+            : "chat-message";
 
 
     /* =========================
@@ -868,23 +815,18 @@ function addMessage(
                 message.created_at
             );
 
-
         const dateLabel =
             document.createElement("div");
-
 
         dateLabel.className =
             "message-date";
 
-
         const now =
             new Date();
-
 
         const today =
             date.toDateString() ===
             now.toDateString();
-
 
         const yesterday =
             new Date(
@@ -892,7 +834,6 @@ function addMessage(
                 now.getMonth(),
                 now.getDate() - 1
             ).toDateString();
-
 
         if (today) {
 
@@ -920,7 +861,6 @@ function addMessage(
                 );
         }
 
-
         chatArea.appendChild(
             dateLabel
         );
@@ -928,12 +868,11 @@ function addMessage(
 
 
     /* =========================
-       BUBBLE
+       MESSAGE BUBBLE
     ========================= */
 
     const bubble =
         document.createElement("div");
-
 
     bubble.className =
         "message-bubble";
@@ -946,22 +885,19 @@ function addMessage(
     const content =
         document.createElement("span");
 
-
     content.className =
         "message-content";
-
 
     content.textContent =
         message.content;
 
 
     /* =========================
-       TIMESTAMP
+       MESSAGE TIME
     ========================= */
 
     const time =
         document.createElement("time");
-
 
     time.className =
         "message-time";
@@ -974,10 +910,8 @@ function addMessage(
                 message.created_at
             );
 
-
         time.dateTime =
             message.created_at;
-
 
         time.textContent =
             date.toLocaleTimeString(
@@ -998,11 +932,9 @@ function addMessage(
         time
     );
 
-
     article.appendChild(
         bubble
     );
-
 
     chatArea.appendChild(
         article
@@ -1018,7 +950,6 @@ async function sendMessage(event) {
 
     event.preventDefault();
 
-
     if (
         !currentUser ||
         !receiverId ||
@@ -1027,19 +958,15 @@ async function sendMessage(event) {
         return;
     }
 
-
     const content =
         messageInput.value.trim();
-
 
     if (!content) {
         return;
     }
 
-
     messageInput.disabled =
         true;
-
 
     try {
 
@@ -1066,7 +993,6 @@ async function sendMessage(event) {
             `)
             .single();
 
-
         if (error) {
 
             console.error(
@@ -1077,30 +1003,18 @@ async function sendMessage(event) {
             return;
         }
 
-
         messageInput.value = "";
-
-
-        /*
-           Add our own message immediately.
-
-           Realtime is only displaying messages
-           received from the other person, so
-           this won't duplicate our message.
-        */
 
         addMessage(
             data,
             false
         );
 
-
         if (chatArea) {
 
             chatArea.scrollTop =
                 chatArea.scrollHeight;
         }
-
 
     } finally {
 
@@ -1122,53 +1036,37 @@ if (backButton) {
         "click",
         () => {
 
-            /*
-               Stop realtime when leaving
-               the conversation.
-            */
-
             stopMessageRealtime();
-
 
             receiverId =
                 null;
 
-
             if (chatView) {
-
                 chatView.style.display =
                     "none";
             }
-
 
             const listSection =
                 document.querySelector(
                     ".messages-list-section"
                 );
 
-
             if (listSection) {
-
                 listSection.style.display =
                     "";
             }
-
 
             const defaultHeader =
                 document.getElementById(
                     "messages-default-header"
                 );
 
-
             if (defaultHeader) {
-
                 defaultHeader.style.display =
                     "";
             }
 
-
             if (messageInput) {
-
                 messageInput.value = "";
             }
         }
@@ -1199,18 +1097,12 @@ if (logoutButton) {
         "click",
         async () => {
 
-            /*
-               Clean up realtime before logout.
-            */
-
             stopMessageRealtime();
-
 
             const {
                 error
             } =
                 await supabase.auth.signOut();
-
 
             if (error) {
 
@@ -1221,7 +1113,6 @@ if (logoutButton) {
 
                 return;
             }
-
 
             window.location.href =
                 "login.html";
@@ -1238,16 +1129,13 @@ console.log(
     "🚀 STARTING MESSAGES PAGE..."
 );
 
-
 const loggedIn =
     await loadUser();
-
 
 console.log(
     "✅ LOAD USER FINISHED:",
     loggedIn
 );
-
 
 if (loggedIn) {
 
