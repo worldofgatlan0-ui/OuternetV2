@@ -2,12 +2,14 @@
    UNDERNET NOTIFICATIONS
 ========================= */
 
-let notificationContainer = null;
+import { supabase } from "./supabase.js";
 
 
 /* =========================
-   CREATE CONTAINER
+   IN-PAGE TOASTS
 ========================= */
+
+let notificationContainer = null;
 
 function getNotificationContainer() {
 
@@ -32,10 +34,6 @@ function getNotificationContainer() {
 }
 
 
-/* =========================
-   SHOW NOTIFICATION
-========================= */
-
 export function showNotification({
     title = "NEW MESSAGE",
     message = "",
@@ -49,10 +47,7 @@ export function showNotification({
         document.createElement("button");
 
     toast.type = "button";
-
-    toast.className =
-        "undernet-notification";
-
+    toast.className = "undernet-notification";
 
     const icon =
         document.createElement("div");
@@ -84,22 +79,18 @@ export function showNotification({
         message;
 
 
-    content.appendChild(
-        titleElement
-    );
-
-    content.appendChild(
-        messageElement
-    );
+    content.appendChild(titleElement);
+    content.appendChild(messageElement);
 
 
-    const close = 
+    const close =
         document.createElement("span");
 
     close.className =
         "undernet-notification-close";
 
-    close.textContent = "×";
+    close.textContent =
+        "×";
 
 
     toast.appendChild(icon);
@@ -109,8 +100,6 @@ export function showNotification({
     container.appendChild(toast);
 
 
-    /* CLICK */
-
     toast.addEventListener(
         "click",
         () => {
@@ -119,21 +108,15 @@ export function showNotification({
                 onClick();
             }
 
-            removeNotification(
-                toast
-            );
+            removeNotification(toast);
         }
     );
 
 
-    /* AUTO REMOVE */
-
     const timeout =
         setTimeout(() => {
 
-            removeNotification(
-                toast
-            );
+            removeNotification(toast);
 
         }, 5000);
 
@@ -152,4 +135,99 @@ export function showNotification({
 
         }, 250);
     }
+}
+
+
+/* =========================
+   BROWSER NOTIFICATIONS
+========================= */
+
+export async function requestNotificationPermission() {
+
+    if (!("Notification" in window)) {
+
+        console.warn(
+            "⚠️ Browser notifications are not supported."
+        );
+
+        return false;
+    }
+
+
+    if (Notification.permission === "granted") {
+
+        return true;
+    }
+
+
+    if (Notification.permission === "denied") {
+
+        console.warn(
+            "🔕 Browser notifications are blocked."
+        );
+
+        return false;
+    }
+
+
+    const permission =
+        await Notification.requestPermission();
+
+
+    console.log(
+        "🔔 NOTIFICATION PERMISSION:",
+        permission
+    );
+
+
+    return permission === "granted";
+}
+
+
+/* =========================
+   SHOW BROWSER NOTIFICATION
+========================= */
+
+export function showBrowserNotification({
+    title = "UNDERNET",
+    message = "",
+    url = null
+} = {}) {
+
+    if (!("Notification" in window)) {
+        return;
+    }
+
+
+    if (
+        Notification.permission !==
+        "granted"
+    ) {
+        return;
+    }
+
+
+    const notification =
+        new Notification(
+            title,
+            {
+                body: message,
+                icon: "/favicon.ico",
+                tag: "undernet-message"
+            }
+        );
+
+
+    notification.onclick =
+        () => {
+
+            window.focus();
+
+            if (url) {
+                window.location.href =
+                    url;
+            }
+
+            notification.close();
+        };
 }
