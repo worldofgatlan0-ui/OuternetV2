@@ -2719,3 +2719,170 @@ body.falling-stars::after {
         padding: 35px 25px;
     }
 }
+
+/* =========================
+   UNDERNET NOTIFICATIONS
+========================= */
+
+.undernet-notifications {
+    position: fixed;
+    top: 80px;
+    right: 24px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    width: min(360px, calc(100vw - 32px));
+
+    z-index: 9999;
+
+    pointer-events: none;
+}
+
+
+.undernet-notification {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    width: 100%;
+
+    padding: 14px 16px;
+
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 12px;
+
+    background: rgba(15, 15, 25, 0.96);
+
+    color: white;
+
+    text-align: left;
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.45);
+
+    cursor: pointer;
+
+    pointer-events: auto;
+
+    animation:
+        notification-slide-in
+        0.25s ease;
+}
+
+
+.undernet-notification:hover {
+    transform: translateY(-2px);
+}
+
+
+.undernet-notification-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    font-size: 20px;
+}
+
+
+.undernet-notification-content {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+
+    gap: 3px;
+
+    flex: 1;
+}
+
+
+.undernet-notification-content strong {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+}
+
+
+.undernet-notification-content span {
+    overflow: hidden;
+
+    font-size: 14px;
+
+    color: rgba(255, 255, 255, 0.7);
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+
+.undernet-notification-close {
+    flex-shrink: 0;
+
+    font-size: 22px;
+
+    color: rgba(255, 255, 255, 0.45);
+}
+
+
+.undernet-notification:hover
+.undernet-notification-close {
+    color: white;
+}
+
+
+.notification-hide {
+    animation:
+        notification-slide-out
+        0.25s ease forwards;
+}
+
+
+@keyframes notification-slide-in {
+
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+@keyframes notification-slide-out {
+
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .undernet-notifications {
+        top: 70px;
+        right: 16px;
+        left: 16px;
+
+        width: auto;
+    }
+
+}
