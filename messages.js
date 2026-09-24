@@ -1,5 +1,4 @@
 import { supabase } from "./supabase.js";
-import { showNotification } from "./notifications.js";
 
 console.log("🔥 UNDERNET MESSAGES.JS LOADED");
 console.log("🟢 SUPABASE IMPORTED");
@@ -52,8 +51,6 @@ let currentUser = null;
 let receiverId = null;
 
 let messageChannel = null;
-
-let globalMessageChannel = null;
 
 
 /* =========================
@@ -322,8 +319,8 @@ function createConversation(friend) {
 
     /*
        Store the friend's ID on the
-       button so notifications can
-       find the correct conversation.
+       button so other Undernet code
+       can identify the conversation.
     */
 
     item.dataset.userId =
@@ -412,250 +409,6 @@ function createConversation(friend) {
 
 
 /* =========================
-   GLOBAL DM REALTIME
-========================= */
-
-function subscribeToGlobalMessages() {
-
-    if (!currentUser) {
-        return;
-    }
-
-
-    console.log(
-        "🌐 STARTING GLOBAL DM NOTIFICATIONS..."
-    );
-
-
-    if (globalMessageChannel) {
-
-        supabase.removeChannel(
-            globalMessageChannel
-        );
-
-        globalMessageChannel =
-            null;
-    }
-
-
-    globalMessageChannel =
-        supabase
-            .channel(
-                `global-messages-${currentUser.id}`
-            )
-            .on(
-                "postgres_changes",
-                {
-                    event: "INSERT",
-                    schema: "public",
-                    table: "messages"
-                },
-                async (payload) => {
-
-                    const message =
-                        payload.new;
-
-
-                    console.log(
-                        "🔔 GLOBAL MESSAGE:",
-                        message
-                    );
-
-
-                    /*
-                       Ignore messages that
-                       we sent ourselves.
-                    */
-
-                    if (
-                        message.sender_id ===
-                        currentUser.id
-                    ) {
-                        return;
-                    }
-
-
-                    /*
-                       Only notify when the
-                       message was sent TO us.
-                    */
-
-                    if (
-                        message.receiver_id !==
-                        currentUser.id
-                    ) {
-                        return;
-                    }
-
-
-                    /*
-                       If this exact conversation
-                       is currently open, the normal
-                       chat realtime listener handles it.
-                    */
-
-                    if (
-                        receiverId ===
-                        message.sender_id &&
-                        chatView &&
-                        chatView.style.display !==
-                            "none"
-                    ) {
-                        return;
-                    }
-
-
-                    /*
-                       Get sender profile.
-                    */
-
-                    const {
-                        data: sender,
-                        error
-                    } = await supabase
-                        .from("profiles")
-                        .select(
-                            "id, username, display_name, avatar_url"
-                        )
-                        .eq(
-                            "id",
-                            message.sender_id
-                        )
-                        .maybeSingle();
-
-
-                    if (error) {
-
-                        console.error(
-                            "❌ NOTIFICATION PROFILE ERROR:",
-                            error
-                        );
-                    }
-
-
-                    const senderName =
-                        sender?.display_name ||
-                        sender?.username ||
-                        "Someone";
-
-
-                    /*
-                       Show Undernet notification.
-                    */
-
-                    showNotification({
-
-                        title:
-                            `MESSAGE FROM ${senderName.toUpperCase()}`,
-
-                        message:
-                            message.content,
-
-                        onClick: () => {
-
-                            /*
-                               If the friend list exists,
-                               try opening the conversation
-                               directly.
-                            */
-
-                            const friendButton =
-                                document.querySelector(
-                                    `.conversation-item[data-user-id="${message.sender_id}"]`
-                                );
-
-
-                            if (friendButton) {
-
-                                friendButton.click();
-
-                                return;
-                            }
-
-
-                            /*
-                               Fallback: go to the
-                               messages page.
-                            */
-
-                            window.location.href =
-                                "messages.html";
-                        }
-                    });
-                }
-            )
-            .subscribe(
-                (status) => {
-
-                    console.log(
-                        "🌐 GLOBAL DM STATUS:",
-                        status
-                    );
-
-
-                    if (
-                        status ===
-                        "SUBSCRIBED"
-                    ) {
-
-                        console.log(
-                            "✅ GLOBAL DM NOTIFICATIONS CONNECTED!"
-                        );
-                    }
-
-
-                    if (
-                        status ===
-                        "CHANNEL_ERROR"
-                    ) {
-
-                        console.error(
-                            "❌ GLOBAL DM CHANNEL ERROR"
-                        );
-                    }
-
-
-                    if (
-                        status ===
-                        "TIMED_OUT"
-                    ) {
-
-                        console.error(
-                            "❌ GLOBAL DM TIMED OUT"
-                        );
-                    }
-                }
-            );
-}
-
-
-/* =========================
-   STOP GLOBAL REALTIME
-========================= */
-
-function stopGlobalMessageRealtime() {
-
-    if (!globalMessageChannel) {
-        return;
-    }
-
-
-    console.log(
-        "🌐 STOPPING GLOBAL DM REALTIME"
-    );
-
-
-    supabase.removeChannel(
-        globalMessageChannel
-    );
-
-
-    globalMessageChannel =
-        null;
-}
-
-
-/* =========================
    REALTIME CURRENT CHAT
 ========================= */
 
@@ -674,6 +427,11 @@ function subscribeToMessages() {
         receiverId
     );
 
+
+    /*
+       Remove any previous chat
+       listener before creating a new one.
+    */
 
     if (messageChannel) {
 
@@ -714,6 +472,11 @@ function subscribeToMessages() {
                     );
 
 
+                    /*
+                       Only handle messages belonging
+                       to the conversation currently open.
+                    */
+
                     const isThisConversation =
                         (
                             message.sender_id ===
@@ -724,7 +487,26 @@ function subscribeToMessages() {
                         );
 
 
-                    if (!isThisConversation) {
+                    /*
+                       Also allow our own newly
+                       inserted message through
+                       if Supabase sends it to us.
+                    */
+
+                    const isOwnMessage =
+                        (
+                            message.sender_id ===
+                                currentUser.id &&
+
+                            message.receiver_id ===
+                                receiverId
+                        );
+
+
+                    if (
+                        !isThisConversation &&
+                        !isOwnMessage
+                    ) {
                         return;
                     }
 
@@ -762,8 +544,21 @@ function subscribeToMessages() {
 
 
                     /*
-                       Add incoming message.
+                       Prevent duplicate display
+                       if our own sent message was
+                       already added optimistically.
                     */
+
+                    if (
+                        message.id &&
+                        chatArea &&
+                        chatArea.querySelector(
+                            `[data-message-id="${message.id}"]`
+                        )
+                    ) {
+                        return;
+                    }
+
 
                     addMessage(
                         message,
@@ -1088,10 +883,38 @@ function addMessage(
     }
 
 
+    /*
+       Prevent duplicate messages
+       when Realtime catches a message
+       that was already displayed.
+    */
+
+    if (
+        message.id &&
+        chatArea.querySelector(
+            `[data-message-id="${message.id}"]`
+        )
+    ) {
+        return;
+    }
+
+
     const article =
         document.createElement(
             "article"
         );
+
+
+    /*
+       Store the database message ID
+       on the element.
+    */
+
+    if (message.id) {
+
+        article.dataset.messageId =
+            message.id;
+    }
 
 
     const isOwn =
@@ -1310,6 +1133,7 @@ async function sendMessage(event) {
         } = await supabase
             .from("messages")
             .insert({
+
                 sender_id:
                     currentUser.id,
 
@@ -1318,6 +1142,7 @@ async function sendMessage(event) {
 
                 content:
                     content
+
             })
             .select(`
                 id,
@@ -1347,6 +1172,13 @@ async function sendMessage(event) {
         messageInput.value =
             "";
 
+
+        /*
+           Display our message immediately.
+
+           The duplicate check in addMessage()
+           prevents Realtime from adding it twice.
+        */
 
         addMessage(
             data,
@@ -1455,8 +1287,6 @@ if (logoutButton) {
 
             stopMessageRealtime();
 
-            stopGlobalMessageRealtime();
-
 
             const {
                 error
@@ -1513,10 +1343,14 @@ if (loggedIn) {
 
     /*
        IMPORTANT:
-       This starts immediately,
-       even when no conversation
-       is currently open.
-    */
+       There is NO global realtime
+       listener here anymore.
 
-    subscribeToGlobalMessages();
+       global-notifications.js handles:
+
+       💬 DMs from anywhere
+       🖥️ Server messages from anywhere
+       🔔 Toast notifications
+       🔔 Browser notifications
+    */
 }
