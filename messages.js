@@ -1,4 +1,5 @@
 import { supabase } from "./supabase.js";
+import { showNotification } from "./notifications.js";
 
 console.log("🔥 UNDERNET MESSAGES.JS LOADED");
 console.log("🟢 SUPABASE IMPORTED");
@@ -47,8 +48,12 @@ const logoutButton =
 ========================= */
 
 let currentUser = null;
+
 let receiverId = null;
+
 let messageChannel = null;
+
+let globalMessageChannel = null;
 
 
 /* =========================
@@ -73,7 +78,8 @@ async function loadUser() {
             error
         );
 
-        window.location.href = "login.html";
+        window.location.href =
+            "login.html";
 
         return false;
     }
@@ -98,7 +104,10 @@ async function loadUser() {
         .select(
             "username, display_name, avatar_url"
         )
-        .eq("id", user.id)
+        .eq(
+            "id",
+            user.id
+        )
         .maybeSingle();
 
 
@@ -171,7 +180,10 @@ async function loadUser() {
 
 async function loadFriends() {
 
-    if (!conversationList || !currentUser) {
+    if (
+        !conversationList ||
+        !currentUser
+    ) {
         return;
     }
 
@@ -308,6 +320,16 @@ function createConversation(friend) {
         "conversation-item";
 
 
+    /*
+       Store the friend's ID on the
+       button so notifications can
+       find the correct conversation.
+    */
+
+    item.dataset.userId =
+        friend.id;
+
+
     const avatar =
         document.createElement("div");
 
@@ -359,11 +381,22 @@ function createConversation(friend) {
         "🟢 Online";
 
 
-    info.appendChild(username);
-    info.appendChild(status);
+    info.appendChild(
+        username
+    );
 
-    item.appendChild(avatar);
-    item.appendChild(info);
+    info.appendChild(
+        status
+    );
+
+
+    item.appendChild(
+        avatar
+    );
+
+    item.appendChild(
+        info
+    );
 
 
     item.addEventListener(
@@ -372,12 +405,258 @@ function createConversation(friend) {
     );
 
 
-    conversationList.appendChild(item);
+    conversationList.appendChild(
+        item
+    );
 }
 
 
 /* =========================
-   REALTIME MESSAGES
+   GLOBAL DM REALTIME
+========================= */
+
+function subscribeToGlobalMessages() {
+
+    if (!currentUser) {
+        return;
+    }
+
+
+    console.log(
+        "🌐 STARTING GLOBAL DM NOTIFICATIONS..."
+    );
+
+
+    if (globalMessageChannel) {
+
+        supabase.removeChannel(
+            globalMessageChannel
+        );
+
+        globalMessageChannel =
+            null;
+    }
+
+
+    globalMessageChannel =
+        supabase
+            .channel(
+                `global-messages-${currentUser.id}`
+            )
+            .on(
+                "postgres_changes",
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "messages"
+                },
+                async (payload) => {
+
+                    const message =
+                        payload.new;
+
+
+                    console.log(
+                        "🔔 GLOBAL MESSAGE:",
+                        message
+                    );
+
+
+                    /*
+                       Ignore messages that
+                       we sent ourselves.
+                    */
+
+                    if (
+                        message.sender_id ===
+                        currentUser.id
+                    ) {
+                        return;
+                    }
+
+
+                    /*
+                       Only notify when the
+                       message was sent TO us.
+                    */
+
+                    if (
+                        message.receiver_id !==
+                        currentUser.id
+                    ) {
+                        return;
+                    }
+
+
+                    /*
+                       If this exact conversation
+                       is currently open, the normal
+                       chat realtime listener handles it.
+                    */
+
+                    if (
+                        receiverId ===
+                        message.sender_id &&
+                        chatView &&
+                        chatView.style.display !==
+                            "none"
+                    ) {
+                        return;
+                    }
+
+
+                    /*
+                       Get sender profile.
+                    */
+
+                    const {
+                        data: sender,
+                        error
+                    } = await supabase
+                        .from("profiles")
+                        .select(
+                            "id, username, display_name, avatar_url"
+                        )
+                        .eq(
+                            "id",
+                            message.sender_id
+                        )
+                        .maybeSingle();
+
+
+                    if (error) {
+
+                        console.error(
+                            "❌ NOTIFICATION PROFILE ERROR:",
+                            error
+                        );
+                    }
+
+
+                    const senderName =
+                        sender?.display_name ||
+                        sender?.username ||
+                        "Someone";
+
+
+                    /*
+                       Show Undernet notification.
+                    */
+
+                    showNotification({
+
+                        title:
+                            `MESSAGE FROM ${senderName.toUpperCase()}`,
+
+                        message:
+                            message.content,
+
+                        onClick: () => {
+
+                            /*
+                               If the friend list exists,
+                               try opening the conversation
+                               directly.
+                            */
+
+                            const friendButton =
+                                document.querySelector(
+                                    `.conversation-item[data-user-id="${message.sender_id}"]`
+                                );
+
+
+                            if (friendButton) {
+
+                                friendButton.click();
+
+                                return;
+                            }
+
+
+                            /*
+                               Fallback: go to the
+                               messages page.
+                            */
+
+                            window.location.href =
+                                "messages.html";
+                        }
+                    });
+                }
+            )
+            .subscribe(
+                (status) => {
+
+                    console.log(
+                        "🌐 GLOBAL DM STATUS:",
+                        status
+                    );
+
+
+                    if (
+                        status ===
+                        "SUBSCRIBED"
+                    ) {
+
+                        console.log(
+                            "✅ GLOBAL DM NOTIFICATIONS CONNECTED!"
+                        );
+                    }
+
+
+                    if (
+                        status ===
+                        "CHANNEL_ERROR"
+                    ) {
+
+                        console.error(
+                            "❌ GLOBAL DM CHANNEL ERROR"
+                        );
+                    }
+
+
+                    if (
+                        status ===
+                        "TIMED_OUT"
+                    ) {
+
+                        console.error(
+                            "❌ GLOBAL DM TIMED OUT"
+                        );
+                    }
+                }
+            );
+}
+
+
+/* =========================
+   STOP GLOBAL REALTIME
+========================= */
+
+function stopGlobalMessageRealtime() {
+
+    if (!globalMessageChannel) {
+        return;
+    }
+
+
+    console.log(
+        "🌐 STOPPING GLOBAL DM REALTIME"
+    );
+
+
+    supabase.removeChannel(
+        globalMessageChannel
+    );
+
+
+    globalMessageChannel =
+        null;
+}
+
+
+/* =========================
+   REALTIME CURRENT CHAT
 ========================= */
 
 function subscribeToMessages() {
@@ -391,12 +670,10 @@ function subscribeToMessages() {
 
 
     console.log(
-        "📡 STARTING REALTIME:",
+        "📡 STARTING CHAT REALTIME:",
         receiverId
     );
 
-
-    /* Remove previous channel */
 
     if (messageChannel) {
 
@@ -408,7 +685,8 @@ function subscribeToMessages() {
             messageChannel
         );
 
-        messageChannel = null;
+        messageChannel =
+            null;
     }
 
 
@@ -436,30 +714,23 @@ function subscribeToMessages() {
                     );
 
 
-                    /*
-                       Only display messages
-                       belonging to this chat.
-                    */
-
                     const isThisConversation =
                         (
                             message.sender_id ===
                                 receiverId &&
+
                             message.receiver_id ===
                                 currentUser.id
                         );
 
 
                     if (!isThisConversation) {
-
                         return;
                     }
 
 
                     /*
-                       Get the sender profile so
-                       the message has the same
-                       shape as normal messages.
+                       Get sender profile.
                     */
 
                     const {
@@ -491,8 +762,7 @@ function subscribeToMessages() {
 
 
                     /*
-                       Add the incoming message
-                       immediately.
+                       Add incoming message.
                     */
 
                     addMessage(
@@ -516,6 +786,7 @@ function subscribeToMessages() {
                         status
                     );
 
+
                     if (
                         status ===
                         "SUBSCRIBED"
@@ -526,6 +797,7 @@ function subscribeToMessages() {
                         );
                     }
 
+
                     if (
                         status ===
                         "CHANNEL_ERROR"
@@ -535,6 +807,7 @@ function subscribeToMessages() {
                             "❌ REALTIME CHANNEL ERROR"
                         );
                     }
+
 
                     if (
                         status ===
@@ -551,7 +824,7 @@ function subscribeToMessages() {
 
 
 /* =========================
-   STOP REALTIME
+   STOP CHAT REALTIME
 ========================= */
 
 function stopMessageRealtime() {
@@ -562,7 +835,7 @@ function stopMessageRealtime() {
 
 
     console.log(
-        "📡 STOPPING REALTIME"
+        "📡 STOPPING CHAT REALTIME"
     );
 
 
@@ -585,20 +858,25 @@ async function openChat(friend) {
     receiverId =
         friend.id;
 
+
     console.log(
         "💬 OPENING CHAT:",
         friend.id
     );
+
 
     const name =
         friend.display_name ||
         friend.username ||
         "Unknown";
 
+
     if (messageUsername) {
+
         messageUsername.textContent =
             name;
     }
+
 
     if (messageAvatar) {
 
@@ -627,30 +905,39 @@ async function openChat(friend) {
         }
     }
 
+
     const listSection =
         document.querySelector(
             ".messages-list-section"
         );
 
+
     if (listSection) {
+
         listSection.style.display =
             "none";
     }
+
 
     const defaultHeader =
         document.getElementById(
             "messages-default-header"
         );
 
+
     if (defaultHeader) {
+
         defaultHeader.style.display =
             "none";
     }
 
+
     if (chatView) {
+
         chatView.style.display =
             "flex";
     }
+
 
     await loadMessages();
 
@@ -672,8 +959,10 @@ async function loadMessages() {
         return;
     }
 
+
     chatArea.innerHTML =
         "<div class='empty-box'>Loading messages...</div>";
+
 
     const {
         data,
@@ -701,7 +990,9 @@ async function loadMessages() {
             }
         );
 
+
     if (error) {
+
         console.error(
             "❌ MESSAGE LOAD ERROR:",
             error
@@ -713,7 +1004,10 @@ async function loadMessages() {
         return;
     }
 
-    chatArea.innerHTML = "";
+
+    chatArea.innerHTML =
+        "";
+
 
     if (
         !data ||
@@ -722,6 +1016,7 @@ async function loadMessages() {
 
         chatArea.innerHTML = `
             <div class="empty-chat">
+
                 <div class="empty-chat-icon">
                     💬
                 </div>
@@ -733,13 +1028,17 @@ async function loadMessages() {
                 <p>
                     Send a message to start the conversation!
                 </p>
+
             </div>
         `;
 
         return;
     }
 
-    let lastDate = null;
+
+    let lastDate =
+        null;
+
 
     data.forEach(
         (message) => {
@@ -749,18 +1048,23 @@ async function loadMessages() {
                     message.created_at
                 ).toDateString();
 
+
             const showDate =
-                messageDate !== lastDate;
+                messageDate !==
+                lastDate;
+
 
             addMessage(
                 message,
                 showDate
             );
 
+
             lastDate =
                 messageDate;
         }
     );
+
 
     chatArea.scrollTop =
         chatArea.scrollHeight;
@@ -776,24 +1080,24 @@ function addMessage(
     showDate = false
 ) {
 
-    if (!chatArea || !currentUser) {
+    if (
+        !chatArea ||
+        !currentUser
+    ) {
         return;
     }
 
+
     const article =
-        document.createElement("article");
+        document.createElement(
+            "article"
+        );
+
 
     const isOwn =
         message.sender_id ===
         currentUser.id;
 
-
-    /*
-       IMPORTANT:
-       Use chat-message here instead of
-       message so the DM system does not
-       collide with the server chat styles.
-    */
 
     article.className =
         isOwn
@@ -815,18 +1119,25 @@ function addMessage(
                 message.created_at
             );
 
+
         const dateLabel =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         dateLabel.className =
             "message-date";
 
+
         const now =
             new Date();
+
 
         const today =
             date.toDateString() ===
             now.toDateString();
+
 
         const yesterday =
             new Date(
@@ -834,6 +1145,7 @@ function addMessage(
                 now.getMonth(),
                 now.getDate() - 1
             ).toDateString();
+
 
         if (today) {
 
@@ -861,6 +1173,7 @@ function addMessage(
                 );
         }
 
+
         chatArea.appendChild(
             dateLabel
         );
@@ -872,7 +1185,10 @@ function addMessage(
     ========================= */
 
     const bubble =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     bubble.className =
         "message-bubble";
@@ -883,10 +1199,14 @@ function addMessage(
     ========================= */
 
     const content =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
+
 
     content.className =
         "message-content";
+
 
     content.textContent =
         message.content;
@@ -897,21 +1217,28 @@ function addMessage(
     ========================= */
 
     const time =
-        document.createElement("time");
+        document.createElement(
+            "time"
+        );
+
 
     time.className =
         "message-time";
 
 
-    if (message.created_at) {
+    if (
+        message.created_at
+    ) {
 
         const date =
             new Date(
                 message.created_at
             );
 
+
         time.dateTime =
             message.created_at;
+
 
         time.textContent =
             date.toLocaleTimeString(
@@ -932,9 +1259,11 @@ function addMessage(
         time
     );
 
+
     article.appendChild(
         bubble
     );
+
 
     chatArea.appendChild(
         article
@@ -950,6 +1279,7 @@ async function sendMessage(event) {
 
     event.preventDefault();
 
+
     if (
         !currentUser ||
         !receiverId ||
@@ -958,15 +1288,19 @@ async function sendMessage(event) {
         return;
     }
 
+
     const content =
         messageInput.value.trim();
+
 
     if (!content) {
         return;
     }
 
+
     messageInput.disabled =
         true;
+
 
     try {
 
@@ -976,9 +1310,14 @@ async function sendMessage(event) {
         } = await supabase
             .from("messages")
             .insert({
-                sender_id: currentUser.id,
-                receiver_id: receiverId,
-                content: content
+                sender_id:
+                    currentUser.id,
+
+                receiver_id:
+                    receiverId,
+
+                content:
+                    content
             })
             .select(`
                 id,
@@ -993,6 +1332,7 @@ async function sendMessage(event) {
             `)
             .single();
 
+
         if (error) {
 
             console.error(
@@ -1003,12 +1343,16 @@ async function sendMessage(event) {
             return;
         }
 
-        messageInput.value = "";
+
+        messageInput.value =
+            "";
+
 
         addMessage(
             data,
             false
         );
+
 
         if (chatArea) {
 
@@ -1038,36 +1382,48 @@ if (backButton) {
 
             stopMessageRealtime();
 
+
             receiverId =
                 null;
 
+
             if (chatView) {
+
                 chatView.style.display =
                     "none";
             }
+
 
             const listSection =
                 document.querySelector(
                     ".messages-list-section"
                 );
 
+
             if (listSection) {
+
                 listSection.style.display =
                     "";
             }
+
 
             const defaultHeader =
                 document.getElementById(
                     "messages-default-header"
                 );
 
+
             if (defaultHeader) {
+
                 defaultHeader.style.display =
                     "";
             }
 
+
             if (messageInput) {
-                messageInput.value = "";
+
+                messageInput.value =
+                    "";
             }
         }
     );
@@ -1099,10 +1455,14 @@ if (logoutButton) {
 
             stopMessageRealtime();
 
+            stopGlobalMessageRealtime();
+
+
             const {
                 error
             } =
                 await supabase.auth.signOut();
+
 
             if (error) {
 
@@ -1113,6 +1473,7 @@ if (logoutButton) {
 
                 return;
             }
+
 
             window.location.href =
                 "login.html";
@@ -1129,13 +1490,16 @@ console.log(
     "🚀 STARTING MESSAGES PAGE..."
 );
 
+
 const loggedIn =
     await loadUser();
+
 
 console.log(
     "✅ LOAD USER FINISHED:",
     loggedIn
 );
+
 
 if (loggedIn) {
 
@@ -1143,5 +1507,16 @@ if (loggedIn) {
         "👥 STARTING FRIEND LOAD..."
     );
 
+
     await loadFriends();
+
+
+    /*
+       IMPORTANT:
+       This starts immediately,
+       even when no conversation
+       is currently open.
+    */
+
+    subscribeToGlobalMessages();
 }
