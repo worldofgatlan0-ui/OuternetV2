@@ -5,6 +5,138 @@ console.log("🟢 SUPABASE IMPORTED");
 
 
 /* =========================
+   CHAT STYLES
+========================= */
+
+const chatStyle = document.createElement("style");
+
+chatStyle.textContent = `
+/* CHAT AREA */
+
+#chat-area {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+
+/* MESSAGE ROW */
+
+.chat-message {
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+}
+
+
+/* YOUR MESSAGE */
+
+.chat-message.own {
+    justify-content: flex-end;
+}
+
+
+/* MESSAGE BUBBLE */
+
+.message-bubble {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    max-width: min(70%, 520px);
+
+    padding: 10px 14px;
+
+    border-radius: 16px;
+
+    background: #252535;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    box-shadow:
+        0 3px 8px rgba(0,0,0,0.18);
+
+    word-break: break-word;
+}
+
+
+/* FRIEND BUBBLE */
+
+.chat-message:not(.own) .message-bubble {
+    border-bottom-left-radius: 5px;
+}
+
+
+/* YOUR BUBBLE */
+
+.chat-message.own .message-bubble {
+    border-bottom-right-radius: 5px;
+}
+
+
+/* MESSAGE TEXT */
+
+.message-content {
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+
+/* TIME */
+
+.message-time {
+    align-self: flex-end;
+
+    font-size: 10px;
+
+    opacity: 0.55;
+
+    white-space: nowrap;
+}
+
+
+/* DATE SEPARATOR */
+
+.message-date {
+    align-self: center;
+
+    margin: 16px 0 8px;
+
+    padding: 5px 12px;
+
+    border-radius: 999px;
+
+    background: rgba(255,255,255,0.06);
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    font-size: 11px;
+
+    opacity: 0.7;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    .message-bubble {
+        max-width: 82%;
+    }
+
+    #chat-area {
+        padding: 12px;
+    }
+}
+`;
+
+document.head.appendChild(chatStyle);
+
+
+/* =========================
    DOM ELEMENTS
 ========================= */
 
@@ -47,9 +179,7 @@ const logoutButton =
 ========================= */
 
 let currentUser = null;
-
 let receiverId = null;
-
 let messageChannel = null;
 
 
@@ -70,50 +200,30 @@ async function loadUser() {
 
     if (error || !user) {
 
-        console.error(
-            "❌ AUTH ERROR:",
-            error
-        );
+        console.error("❌ AUTH ERROR:", error);
 
-        window.location.href =
-            "login.html";
+        window.location.href = "login.html";
 
         return false;
     }
 
     currentUser = user;
 
-    console.log(
-        "👤 LOGGED IN:",
-        user.id
-    );
+    console.log("👤 LOGGED IN:", user.id);
 
-
-    /* =========================
-       LOAD PROFILE
-    ========================= */
 
     const {
         data: profile,
         error: profileError
     } = await supabase
         .from("profiles")
-        .select(
-            "username, display_name, avatar_url"
-        )
-        .eq(
-            "id",
-            user.id
-        )
+        .select("username, display_name, avatar_url")
+        .eq("id", user.id)
         .maybeSingle();
 
 
     if (profileError) {
-
-        console.error(
-            "❌ PROFILE ERROR:",
-            profileError
-        );
+        console.error("❌ PROFILE ERROR:", profileError);
     }
 
 
@@ -124,20 +234,10 @@ async function loadUser() {
         "Unknown";
 
 
-    /* =========================
-       NAV USERNAME
-    ========================= */
-
     if (navUsername) {
-
-        navUsername.textContent =
-            username;
+        navUsername.textContent = username;
     }
 
-
-    /* =========================
-       NAV AVATAR
-    ========================= */
 
     if (navAvatar) {
 
@@ -148,21 +248,15 @@ async function loadUser() {
             navAvatar.style.backgroundImage =
                 `url("${profile.avatar_url}")`;
 
-            navAvatar.style.backgroundSize =
-                "cover";
-
-            navAvatar.style.backgroundPosition =
-                "center";
+            navAvatar.style.backgroundSize = "cover";
+            navAvatar.style.backgroundPosition = "center";
 
         } else {
 
-            navAvatar.style.backgroundImage =
-                "";
+            navAvatar.style.backgroundImage = "";
 
             navAvatar.textContent =
-                username
-                    .charAt(0)
-                    .toUpperCase();
+                username.charAt(0).toUpperCase();
         }
     }
 
@@ -177,16 +271,11 @@ async function loadUser() {
 
 async function loadFriends() {
 
-    if (
-        !conversationList ||
-        !currentUser
-    ) {
+    if (!conversationList || !currentUser) {
         return;
     }
 
-    console.log(
-        "👥 LOADING FRIENDS..."
-    );
+    console.log("👥 LOADING FRIENDS...");
 
     conversationList.innerHTML =
         "<div class='empty-box'>Loading friends...</div>";
@@ -197,9 +286,7 @@ async function loadFriends() {
         error
     } = await supabase
         .from("friendships")
-        .select(
-            "user1_id, user2_id"
-        )
+        .select("user1_id, user2_id")
         .or(
             `user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`
         );
@@ -214,10 +301,7 @@ async function loadFriends() {
 
     if (error) {
 
-        console.error(
-            "❌ FRIENDSHIP ERROR:",
-            error
-        );
+        console.error("❌ FRIENDSHIP ERROR:", error);
 
         conversationList.innerHTML =
             "<div class='empty-box'>Could not load friends.</div>";
@@ -226,10 +310,7 @@ async function loadFriends() {
     }
 
 
-    if (
-        !friendships ||
-        friendships.length === 0
-    ) {
+    if (!friendships || friendships.length === 0) {
 
         conversationList.innerHTML =
             "<div class='empty-box'>You don't have any friends yet.</div>";
@@ -239,23 +320,12 @@ async function loadFriends() {
 
 
     const friendIds =
-        friendships.map(
-            (friendship) => {
+        friendships.map(friendship => {
 
-                return friendship.user1_id ===
-                    currentUser.id
-
-                    ? friendship.user2_id
-
-                    : friendship.user1_id;
-            }
-        );
-
-
-    console.log(
-        "🆔 FRIEND IDS:",
-        friendIds
-    );
+            return friendship.user1_id === currentUser.id
+                ? friendship.user2_id
+                : friendship.user1_id;
+        });
 
 
     const {
@@ -263,20 +333,8 @@ async function loadFriends() {
         error: friendError
     } = await supabase
         .from("profiles")
-        .select(
-            "id, username, display_name, avatar_url"
-        )
-        .in(
-            "id",
-            friendIds
-        );
-
-
-    console.log(
-        "👤 FRIEND PROFILES:",
-        friends,
-        friendError
-    );
+        .select("id, username, display_name, avatar_url")
+        .in("id", friendIds);
 
 
     if (friendError) {
@@ -295,10 +353,7 @@ async function loadFriends() {
 
     conversationList.innerHTML = "";
 
-
-    friends.forEach(
-        createConversation
-    );
+    friends.forEach(createConversation);
 }
 
 
@@ -312,26 +367,14 @@ function createConversation(friend) {
         document.createElement("button");
 
     item.type = "button";
-
-    item.className =
-        "conversation-item";
-
-
-    /*
-       Store the friend's ID on the
-       button so other Undernet code
-       can identify the conversation.
-    */
-
-    item.dataset.userId =
-        friend.id;
+    item.className = "conversation-item";
+    item.dataset.userId = friend.id;
 
 
     const avatar =
         document.createElement("div");
 
-    avatar.className =
-        "message-avatar";
+    avatar.className = "message-avatar";
 
 
     const name =
@@ -345,18 +388,13 @@ function createConversation(friend) {
         avatar.style.backgroundImage =
             `url("${friend.avatar_url}")`;
 
-        avatar.style.backgroundSize =
-            "cover";
-
-        avatar.style.backgroundPosition =
-            "center";
+        avatar.style.backgroundSize = "cover";
+        avatar.style.backgroundPosition = "center";
 
     } else {
 
         avatar.textContent =
-            name
-                .charAt(0)
-                .toUpperCase();
+            name.charAt(0).toUpperCase();
     }
 
 
@@ -367,33 +405,20 @@ function createConversation(friend) {
     const username =
         document.createElement("strong");
 
-    username.textContent =
-        name;
+    username.textContent = name;
 
 
     const status =
         document.createElement("span");
 
-    status.textContent =
-        "🟢 Online";
+    status.textContent = "🟢 Online";
 
 
-    info.appendChild(
-        username
-    );
+    info.appendChild(username);
+    info.appendChild(status);
 
-    info.appendChild(
-        status
-    );
-
-
-    item.appendChild(
-        avatar
-    );
-
-    item.appendChild(
-        info
-    );
+    item.appendChild(avatar);
+    item.appendChild(info);
 
 
     item.addEventListener(
@@ -402,49 +427,28 @@ function createConversation(friend) {
     );
 
 
-    conversationList.appendChild(
-        item
-    );
+    conversationList.appendChild(item);
 }
 
 
 /* =========================
-   REALTIME CURRENT CHAT
+   REALTIME
 ========================= */
 
 function subscribeToMessages() {
 
-    if (
-        !currentUser ||
-        !receiverId
-    ) {
+    if (!currentUser || !receiverId) {
         return;
     }
 
 
-    console.log(
-        "📡 STARTING CHAT REALTIME:",
-        receiverId
-    );
-
-
-    /*
-       Remove any previous chat
-       listener before creating a new one.
-    */
-
     if (messageChannel) {
-
-        console.log(
-            "📡 REMOVING OLD REALTIME CHANNEL"
-        );
 
         supabase.removeChannel(
             messageChannel
         );
 
-        messageChannel =
-            null;
+        messageChannel = null;
     }
 
 
@@ -460,46 +464,23 @@ function subscribeToMessages() {
                     schema: "public",
                     table: "messages"
                 },
-                async (payload) => {
+                async payload => {
 
                     const message =
                         payload.new;
 
 
-                    console.log(
-                        "📨 REALTIME MESSAGE:",
-                        message
-                    );
-
-
-                    /*
-                       Only handle messages belonging
-                       to the conversation currently open.
-                    */
-
                     const isThisConversation =
                         (
-                            message.sender_id ===
-                                receiverId &&
-
-                            message.receiver_id ===
-                                currentUser.id
+                            message.sender_id === receiverId &&
+                            message.receiver_id === currentUser.id
                         );
 
 
-                    /*
-                       Also allow our own newly
-                       inserted message through
-                       if Supabase sends it to us.
-                    */
-
                     const isOwnMessage =
                         (
-                            message.sender_id ===
-                                currentUser.id &&
-
-                            message.receiver_id ===
-                                receiverId
+                            message.sender_id === currentUser.id &&
+                            message.receiver_id === receiverId
                         );
 
 
@@ -511,48 +492,9 @@ function subscribeToMessages() {
                     }
 
 
-                    /*
-                       Get sender profile.
-                    */
-
-                    const {
-                        data: sender,
-                        error
-                    } = await supabase
-                        .from("profiles")
-                        .select(
-                            "username, display_name"
-                        )
-                        .eq(
-                            "id",
-                            message.sender_id
-                        )
-                        .maybeSingle();
-
-
-                    if (error) {
-
-                        console.error(
-                            "❌ REALTIME PROFILE ERROR:",
-                            error
-                        );
-                    }
-
-
-                    message.sender =
-                        sender || null;
-
-
-                    /*
-                       Prevent duplicate display
-                       if our own sent message was
-                       already added optimistically.
-                    */
-
                     if (
                         message.id &&
-                        chatArea &&
-                        chatArea.querySelector(
+                        chatArea?.querySelector(
                             `[data-message-id="${message.id}"]`
                         )
                     ) {
@@ -560,66 +502,43 @@ function subscribeToMessages() {
                     }
 
 
+                    const {
+                        data: sender
+                    } = await supabase
+                        .from("profiles")
+                        .select("username, display_name")
+                        .eq("id", message.sender_id)
+                        .maybeSingle();
+
+
+                    message.sender =
+                        sender || null;
+
+
                     addMessage(
                         message,
-                        false
+                        shouldShowDate(message.created_at)
                     );
 
 
                     if (chatArea) {
-
                         chatArea.scrollTop =
                             chatArea.scrollHeight;
                     }
                 }
             )
-            .subscribe(
-                (status) => {
+            .subscribe(status => {
 
-                    console.log(
-                        "📡 REALTIME STATUS:",
-                        status
-                    );
-
-
-                    if (
-                        status ===
-                        "SUBSCRIBED"
-                    ) {
-
-                        console.log(
-                            "✅ REALTIME CONNECTED!"
-                        );
-                    }
-
-
-                    if (
-                        status ===
-                        "CHANNEL_ERROR"
-                    ) {
-
-                        console.error(
-                            "❌ REALTIME CHANNEL ERROR"
-                        );
-                    }
-
-
-                    if (
-                        status ===
-                        "TIMED_OUT"
-                    ) {
-
-                        console.error(
-                            "❌ REALTIME TIMED OUT"
-                        );
-                    }
-                }
-            );
+                console.log(
+                    "📡 REALTIME STATUS:",
+                    status
+                );
+            });
 }
 
 
 /* =========================
-   STOP CHAT REALTIME
+   STOP REALTIME
 ========================= */
 
 function stopMessageRealtime() {
@@ -628,19 +547,98 @@ function stopMessageRealtime() {
         return;
     }
 
-
-    console.log(
-        "📡 STOPPING CHAT REALTIME"
-    );
-
-
     supabase.removeChannel(
         messageChannel
     );
 
+    messageChannel = null;
+}
 
-    messageChannel =
-        null;
+
+/* =========================
+   DATE HELPERS
+========================= */
+
+function getDateKey(dateString) {
+
+    return new Date(
+        dateString
+    ).toDateString();
+}
+
+
+function getDateLabel(dateString) {
+
+    const date =
+        new Date(dateString);
+
+    const now =
+        new Date();
+
+
+    if (
+        date.toDateString() ===
+        now.toDateString()
+    ) {
+        return "Today";
+    }
+
+
+    const yesterday =
+        new Date();
+
+    yesterday.setDate(
+        yesterday.getDate() - 1
+    );
+
+
+    if (
+        date.toDateString() ===
+        yesterday.toDateString()
+    ) {
+        return "Yesterday";
+    }
+
+
+    return date.toLocaleDateString(
+        undefined,
+        {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }
+    );
+}
+
+
+function shouldShowDate(dateString) {
+
+    if (!chatArea || !dateString) {
+        return false;
+    }
+
+
+    const messages =
+        chatArea.querySelectorAll(
+            ".chat-message"
+        );
+
+
+    if (messages.length === 0) {
+        return true;
+    }
+
+
+    const lastMessage =
+        messages[messages.length - 1];
+
+
+    const lastDate =
+        lastMessage.dataset.date;
+
+
+    return lastDate !==
+        getDateKey(dateString);
 }
 
 
@@ -650,8 +648,7 @@ function stopMessageRealtime() {
 
 async function openChat(friend) {
 
-    receiverId =
-        friend.id;
+    receiverId = friend.id;
 
 
     console.log(
@@ -667,9 +664,7 @@ async function openChat(friend) {
 
 
     if (messageUsername) {
-
-        messageUsername.textContent =
-            name;
+        messageUsername.textContent = name;
     }
 
 
@@ -690,13 +685,10 @@ async function openChat(friend) {
 
         } else {
 
-            messageAvatar.style.backgroundImage =
-                "";
+            messageAvatar.style.backgroundImage = "";
 
             messageAvatar.textContent =
-                name
-                    .charAt(0)
-                    .toUpperCase();
+                name.charAt(0).toUpperCase();
         }
     }
 
@@ -708,9 +700,7 @@ async function openChat(friend) {
 
 
     if (listSection) {
-
-        listSection.style.display =
-            "none";
+        listSection.style.display = "none";
     }
 
 
@@ -721,16 +711,12 @@ async function openChat(friend) {
 
 
     if (defaultHeader) {
-
-        defaultHeader.style.display =
-            "none";
+        defaultHeader.style.display = "none";
     }
 
 
     if (chatView) {
-
-        chatView.style.display =
-            "flex";
+        chatView.style.display = "flex";
     }
 
 
@@ -800,30 +786,16 @@ async function loadMessages() {
     }
 
 
-    chatArea.innerHTML =
-        "";
+    chatArea.innerHTML = "";
 
 
-    if (
-        !data ||
-        data.length === 0
-    ) {
+    if (!data || data.length === 0) {
 
         chatArea.innerHTML = `
             <div class="empty-chat">
-
-                <div class="empty-chat-icon">
-                    💬
-                </div>
-
-                <h2>
-                    No messages yet
-                </h2>
-
-                <p>
-                    Send a message to start the conversation!
-                </p>
-
+                <div class="empty-chat-icon">💬</div>
+                <h2>No messages yet</h2>
+                <p>Send a message to start the conversation!</p>
             </div>
         `;
 
@@ -831,34 +803,30 @@ async function loadMessages() {
     }
 
 
-    let lastDate =
-        null;
+    let lastDate = null;
 
 
-    data.forEach(
-        (message) => {
+    data.forEach(message => {
 
-            const messageDate =
-                new Date(
-                    message.created_at
-                ).toDateString();
-
-
-            const showDate =
-                messageDate !==
-                lastDate;
-
-
-            addMessage(
-                message,
-                showDate
+        const dateKey =
+            getDateKey(
+                message.created_at
             );
 
 
-            lastDate =
-                messageDate;
-        }
-    );
+        const showDate =
+            dateKey !== lastDate;
+
+
+        addMessage(
+            message,
+            showDate
+        );
+
+
+        lastDate =
+            dateKey;
+    });
 
 
     chatArea.scrollTop =
@@ -883,12 +851,6 @@ function addMessage(
     }
 
 
-    /*
-       Prevent duplicate messages
-       when Realtime catches a message
-       that was already displayed.
-    */
-
     if (
         message.id &&
         chatArea.querySelector(
@@ -899,21 +861,52 @@ function addMessage(
     }
 
 
-    const article =
-        document.createElement(
-            "article"
+    /* DATE */
+
+    if (
+        showDate &&
+        message.created_at
+    ) {
+
+        const dateLabel =
+            document.createElement("div");
+
+
+        dateLabel.className =
+            "message-date";
+
+
+        dateLabel.textContent =
+            getDateLabel(
+                message.created_at
+            );
+
+
+        chatArea.appendChild(
+            dateLabel
         );
+    }
 
 
-    /*
-       Store the database message ID
-       on the element.
-    */
+    /* MESSAGE */
+
+    const article =
+        document.createElement("article");
+
 
     if (message.id) {
 
         article.dataset.messageId =
             message.id;
+    }
+
+
+    if (message.created_at) {
+
+        article.dataset.date =
+            getDateKey(
+                message.created_at
+            );
     }
 
 
@@ -928,103 +921,20 @@ function addMessage(
             : "chat-message";
 
 
-    /* =========================
-       DATE SEPARATOR
-    ========================= */
-
-    if (
-        showDate &&
-        message.created_at
-    ) {
-
-        const date =
-            new Date(
-                message.created_at
-            );
-
-
-        const dateLabel =
-            document.createElement(
-                "div"
-            );
-
-
-        dateLabel.className =
-            "message-date";
-
-
-        const now =
-            new Date();
-
-
-        const today =
-            date.toDateString() ===
-            now.toDateString();
-
-
-        const yesterday =
-            new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() - 1
-            ).toDateString();
-
-
-        if (today) {
-
-            dateLabel.textContent =
-                "Today";
-
-        } else if (
-            date.toDateString() ===
-            yesterday
-        ) {
-
-            dateLabel.textContent =
-                "Yesterday";
-
-        } else {
-
-            dateLabel.textContent =
-                date.toLocaleDateString(
-                    undefined,
-                    {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric"
-                    }
-                );
-        }
-
-
-        chatArea.appendChild(
-            dateLabel
-        );
-    }
-
-
-    /* =========================
-       MESSAGE BUBBLE
-    ========================= */
+    /* BUBBLE */
 
     const bubble =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
 
     bubble.className =
         "message-bubble";
 
 
-    /* =========================
-       MESSAGE CONTENT
-    ========================= */
+    /* TEXT */
 
     const content =
-        document.createElement(
-            "span"
-        );
+        document.createElement("span");
 
 
     content.className =
@@ -1035,23 +945,17 @@ function addMessage(
         message.content;
 
 
-    /* =========================
-       MESSAGE TIME
-    ========================= */
+    /* TIME */
 
     const time =
-        document.createElement(
-            "time"
-        );
+        document.createElement("time");
 
 
     time.className =
         "message-time";
 
 
-    if (
-        message.created_at
-    ) {
+    if (message.created_at) {
 
         const date =
             new Date(
@@ -1074,23 +978,12 @@ function addMessage(
     }
 
 
-    bubble.appendChild(
-        content
-    );
+    bubble.appendChild(content);
+    bubble.appendChild(time);
 
-    bubble.appendChild(
-        time
-    );
+    article.appendChild(bubble);
 
-
-    article.appendChild(
-        bubble
-    );
-
-
-    chatArea.appendChild(
-        article
-    );
+    chatArea.appendChild(article);
 }
 
 
@@ -1121,8 +1014,7 @@ async function sendMessage(event) {
     }
 
 
-    messageInput.disabled =
-        true;
+    messageInput.disabled = true;
 
 
     try {
@@ -1133,16 +1025,9 @@ async function sendMessage(event) {
         } = await supabase
             .from("messages")
             .insert({
-
-                sender_id:
-                    currentUser.id,
-
-                receiver_id:
-                    receiverId,
-
-                content:
-                    content
-
+                sender_id: currentUser.id,
+                receiver_id: receiverId,
+                content: content
             })
             .select(`
                 id,
@@ -1169,20 +1054,18 @@ async function sendMessage(event) {
         }
 
 
-        messageInput.value =
-            "";
+        messageInput.value = "";
 
 
         /*
-           Display our message immediately.
-
-           The duplicate check in addMessage()
-           prevents Realtime from adding it twice.
+           Display immediately.
         */
 
         addMessage(
             data,
-            false
+            shouldShowDate(
+                data.created_at
+            )
         );
 
 
@@ -1194,8 +1077,7 @@ async function sendMessage(event) {
 
     } finally {
 
-        messageInput.disabled =
-            false;
+        messageInput.disabled = false;
 
         messageInput.focus();
     }
@@ -1214,15 +1096,11 @@ if (backButton) {
 
             stopMessageRealtime();
 
-
-            receiverId =
-                null;
+            receiverId = null;
 
 
             if (chatView) {
-
-                chatView.style.display =
-                    "none";
+                chatView.style.display = "none";
             }
 
 
@@ -1233,9 +1111,7 @@ if (backButton) {
 
 
             if (listSection) {
-
-                listSection.style.display =
-                    "";
+                listSection.style.display = "";
             }
 
 
@@ -1246,16 +1122,12 @@ if (backButton) {
 
 
             if (defaultHeader) {
-
-                defaultHeader.style.display =
-                    "";
+                defaultHeader.style.display = "";
             }
 
 
             if (messageInput) {
-
-                messageInput.value =
-                    "";
+                messageInput.value = "";
             }
         }
     );
@@ -1337,20 +1209,5 @@ if (loggedIn) {
         "👥 STARTING FRIEND LOAD..."
     );
 
-
     await loadFriends();
-
-
-    /*
-       IMPORTANT:
-       There is NO global realtime
-       listener here anymore.
-
-       global-notifications.js handles:
-
-       💬 DMs from anywhere
-       🖥️ Server messages from anywhere
-       🔔 Toast notifications
-       🔔 Browser notifications
-    */
 }
