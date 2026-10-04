@@ -49,6 +49,7 @@ export function showNotification({
     toast.type = "button";
     toast.className = "undernet-notification";
 
+
     const icon =
         document.createElement("div");
 
@@ -89,8 +90,7 @@ export function showNotification({
     close.className =
         "undernet-notification-close";
 
-    close.textContent =
-        "×";
+    close.textContent = "×";
 
 
     toast.appendChild(icon);
@@ -238,17 +238,21 @@ export function showBrowserNotification({
 ========================= */
 
 function urlBase64ToUint8Array(base64String) {
-    const padding = "=".repeat(
-        (4 - (base64String.length % 4)) % 4
-    );
 
-    const base64 = (
-        base64String + padding
-    )
-        .replace(/-/g, "+")
-        .replace(/_/g, "/");
+    const padding =
+        "=".repeat(
+            (4 - (base64String.length % 4)) % 4
+        );
 
-    const rawData = atob(base64);
+    const base64 =
+        (
+            base64String + padding
+        )
+            .replace(/-/g, "+")
+            .replace(/_/g, "/");
+
+    const rawData =
+        atob(base64);
 
     return Uint8Array.from(
         [...rawData].map(
@@ -257,9 +261,8 @@ function urlBase64ToUint8Array(base64String) {
     );
 }
 
-async function setupPushNotifications() {
 
-    /* Check service worker support */
+async function setupPushNotifications() {
 
     if (!("serviceWorker" in navigator)) {
 
@@ -270,8 +273,6 @@ async function setupPushNotifications() {
         return;
     }
 
-
-    /* Check notification support */
 
     if (!("Notification" in window)) {
 
@@ -319,18 +320,22 @@ async function setupPushNotifications() {
         );
 
 
+        /* VAPID PUBLIC KEY */
+
+        const VAPID_PUBLIC_KEY =
+            "BLYDjCkhu00nKYXF59nIFb6nPG5gBjyyCikDJNv0ArdL96YcnK7GJxb9-JcHPAuCT5zWRXfI0WuNXMoY8DGZ-B0";
+
+
         /* Create push subscription */
 
-     const VAPID_PUBLIC_KEY =
-    "BLYDjCkhu00nKYXF59nIFb6nPG5gBjyyCikDJNv0ArdL96YcnK7GJxb9-JcHPAuCT5zWRXfI0WuNXMoY8DGZ-B0";
+        const subscription =
+            await registration.pushManager.subscribe({
+                userVisibleOnly: true,
 
-const subscription =
-    await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(
-            VAPID_PUBLIC_KEY
-        )
-    });
+                applicationServerKey:
+                    urlBase64ToUint8Array(
+                        VAPID_PUBLIC_KEY
+                    )
             });
 
 
@@ -338,7 +343,6 @@ const subscription =
             "📡 PUSH SUBSCRIPTION CREATED:",
             subscription
         );
-
 
     } catch (error) {
 
