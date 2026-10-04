@@ -272,5 +272,18 @@ async function setupPushNotifications() {
 }
 
 
-// Start notification setup when the page loads
-window.addEventListener("load", setupPushNotifications);
+const notificationButton =
+    document.getElementById("enable-notifications");
+
+if (notificationButton) {
+
+    notificationButton.addEventListener(
+        "click",
+        async () => {
+
+            await setupPushNotifications();
+
+        }
+    );
+
+}
