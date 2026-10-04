@@ -256,6 +256,17 @@ async function setupPushNotifications() {
     );
 
     console.log("🔔 Service worker registered!");
+     
+    const subscription =
+    await registration.pushManager.subscribe({
+        userVisibleOnly: true
+    });
+
+console.log(
+    "📡 PUSH SUBSCRIPTION CREATED:",
+    subscription
+);
+     
      const subscription =
     await registration.pushManager.subscribe({
         userVisibleOnly: true
