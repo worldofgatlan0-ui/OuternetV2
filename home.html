@@ -166,61 +166,68 @@
             </button>
 
 
-            <!-- BOTTOM NAV -->
+<!-- BOTTOM NAV -->
 
-            <div class="nav-bottom">
+<div class="nav-bottom">
 
-                <!-- ENABLE NOTIFICATIONS -->
+    <!-- ENABLE NOTIFICATIONS -->
 
-                <button
-                    type="button"
-                    class="nav-link"
-                    id="enable-notifications"
-                >
-                    <span>🔔</span>
-                    <label>Notifications</label>
-                </button>
-
-
-                <!-- ACTIVITY -->
-
-                <a
-                    href="#"
-                    class="nav-link"
-                >
-                    <span>🔔</span>
-                    <label>Activity</label>
-                </a>
-
-
-                <!-- SETTINGS -->
-
-                <a
-                    href="#"
-                    class="nav-link"
-                >
-                    <span>⚙️</span>
-                    <label>Settings</label>
-                </a>
+    <button
+        type="button"
+        id="enable-notifications"
+        style="
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            border: 0;
+            background: transparent;
+            color: inherit;
+            padding: 10px;
+            cursor: pointer;
+            font: inherit;
+            text-align: left;
+        "
+    >
+        <span>🔔</span>
+        <label>Enable Notifications</label>
+    </button>
 
 
-                <!-- LOG OUT -->
+    <!-- ACTIVITY -->
 
-                <button
-                    type="button"
-                    class="nav-link logout"
-                    id="logout-button"
-                >
-                    <span>↪️</span>
-                    <label>Log Out</label>
-                </button>
+    <a
+        href="#"
+        class="nav-link"
+    >
+        <span>🔔</span>
+        <label>Activity</label>
+    </a>
 
-            </div>
 
-        </div>
+    <!-- SETTINGS -->
 
-    </nav>
+    <a
+        href="#"
+        class="nav-link"
+    >
+        <span>⚙️</span>
+        <label>Settings</label>
+    </a>
 
+
+    <!-- LOG OUT -->
+
+    <button
+        type="button"
+        class="nav-link logout"
+        id="logout-button"
+    >
+        <span>↪️</span>
+        <label>Log Out</label>
+    </button>
+
+</div>
 
     <!-- MAIN CONTENT -->
 
