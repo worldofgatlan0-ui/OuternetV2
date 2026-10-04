@@ -1,301 +1,311 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+```
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <title>Undernet</title>
+<title>Undernet</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+<link
+    rel="stylesheet"
+    href="style.css"
+>
+```
+
 </head>
 
 <body class="falling-stars">
 
 <div class="undernet">
 
-    <!-- TOP BAR -->
+```
+<!-- TOP BAR -->
 
-    <header class="topbar">
+<header class="topbar">
 
-        <div class="logo">
-            UNDERNET
+    <div class="logo">
+        UNDERNET
+    </div>
+
+    <div class="top-actions">
+
+        <button
+            type="button"
+            title="Search"
+        >
+            🔍
+        </button>
+
+        <button
+            type="button"
+            title="Settings"
+        >
+            ⚙️
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- SIDEBAR -->
+
+<nav class="nav-zone">
+
+    <div class="menu-indicator">
+
+        <span></span>
+        <span></span>
+        <span></span>
+
+    </div>
+
+
+    <div class="nav-panel">
+
+        <!-- PROFILE -->
+
+        <div class="nav-profile">
+
+            <div
+                class="big-avatar"
+                id="nav-avatar"
+            >
+                ?
+            </div>
+
+            <div>
+
+                <strong id="nav-username">
+                    Loading...
+                </strong>
+
+                <span>
+                    🟢 Online
+                </span>
+
+            </div>
+
         </div>
 
-        <div class="top-actions">
+
+        <!-- MAIN NAVIGATION -->
+
+        <div class="nav-links">
+
+            <a
+                href="home.html"
+                class="nav-link active"
+            >
+                <span>🏠</span>
+                <label>Home</label>
+            </a>
+
+            <a
+                href="messages.html"
+                class="nav-link"
+            >
+                <span>💬</span>
+                <label>Messages</label>
+            </a>
+
+            <a
+                href="friends.html"
+                class="nav-link"
+            >
+                <span>👥</span>
+                <label>Friends</label>
+            </a>
+
+        </div>
+
+
+        <!-- SERVERS -->
+
+        <div class="nav-heading">
+            SERVERS
+        </div>
+
+
+        <div class="server-list">
+
+            <a
+                href="server.html?server=snowdin"
+                class="server"
+            >
+                <span>❄️</span>
+                <label>Snowdin</label>
+            </a>
+
+            <a
+                href="server.html?server=waterfall"
+                class="server"
+            >
+                <span>💧</span>
+                <label>Waterfall</label>
+            </a>
+
+            <a
+                href="server.html?server=hotland"
+                class="server"
+            >
+                <span>🔥</span>
+                <label>Hotland</label>
+            </a>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="add-server"
+        >
+            ＋ Add Server
+        </button>
+
+
+        <!-- BOTTOM NAV -->
+
+        <div class="nav-bottom">
+
+            <!-- ENABLE NOTIFICATIONS -->
 
             <button
                 type="button"
-                title="Search"
+                id="enable-notifications"
+                style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    width: 100%;
+                    border: 0;
+                    background: transparent;
+                    color: inherit;
+                    padding: 10px;
+                    cursor: pointer;
+                    font: inherit;
+                    text-align: left;
+                "
             >
-                🔍
+                <span>🔔</span>
+                <label>Enable Notifications</label>
             </button>
+
+
+            <!-- ACTIVITY -->
+
+            <a
+                href="#"
+                class="nav-link"
+            >
+                <span>🔔</span>
+                <label>Activity</label>
+            </a>
+
+
+            <!-- SETTINGS -->
+
+            <a
+                href="#"
+                class="nav-link"
+            >
+                <span>⚙️</span>
+                <label>Settings</label>
+            </a>
+
+
+            <!-- LOG OUT -->
 
             <button
                 type="button"
-                title="Settings"
+                class="nav-link logout"
+                id="logout-button"
             >
-                ⚙️
+                <span>↪️</span>
+                <label>Log Out</label>
             </button>
 
         </div>
 
-    </header>
+    </div>
+
+</nav>
 
 
-    <!-- SIDEBAR -->
+<!-- MAIN CONTENT -->
 
-    <nav class="nav-zone">
+<main class="content">
 
-        <div class="menu-indicator">
+    <div class="content-header">
 
-            <span></span>
-            <span></span>
-            <span></span>
+        <h2>
+            Home
+        </h2>
+
+    </div>
+
+
+    <div class="content-body">
+
+        <div class="welcome">
+
+            <div class="welcome-icon">
+                👋
+            </div>
+
+            <h1>
+                Welcome to the Undernet!
+            </h1>
+
+            <p>
+                You're logged in as
+                <strong id="welcome-username">
+                    Loading...
+                </strong>.
+            </p>
+
+
+            <div class="quick-actions">
+
+                <button
+                    type="button"
+                    onclick="window.location.href='messages.html'"
+                >
+                    💬 Messages
+                </button>
+
+                <button
+                    type="button"
+                    onclick="window.location.href='friends.html'"
+                >
+                    👥 Friends
+                </button>
+
+            </div>
+
+
+            <!-- NOTIFICATION HELP -->
+
+            <p style="margin-top: 20px;">
+                🔔 Enable notifications to receive
+                Undernet alerts.
+            </p>
 
         </div>
 
+    </div>
 
-        <div class="nav-panel">
-
-            <!-- PROFILE -->
-
-            <div class="nav-profile">
-
-                <div
-                    class="big-avatar"
-                    id="nav-avatar"
-                >
-                    ?
-                </div>
-
-                <div>
-
-                    <strong id="nav-username">
-                        Loading...
-                    </strong>
-
-                    <span>
-                        🟢 Online
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <!-- MAIN NAVIGATION -->
-
-            <div class="nav-links">
-
-                <a
-                    href="home.html"
-                    class="nav-link active"
-                >
-                    <span>🏠</span>
-                    <label>Home</label>
-                </a>
-
-                <a
-                    href="messages.html"
-                    class="nav-link"
-                >
-                    <span>💬</span>
-                    <label>Messages</label>
-                </a>
-
-                <a
-                    href="friends.html"
-                    class="nav-link"
-                >
-                    <span>👥</span>
-                    <label>Friends</label>
-                </a>
-
-            </div>
-
-
-            <!-- SERVERS -->
-
-            <div class="nav-heading">
-                SERVERS
-            </div>
-
-
-            <div class="server-list">
-
-                <a
-                    href="server.html?server=snowdin"
-                    class="server"
-                >
-                    <span>❄️</span>
-                    <label>Snowdin</label>
-                </a>
-
-                <a
-                    href="server.html?server=waterfall"
-                    class="server"
-                >
-                    <span>💧</span>
-                    <label>Waterfall</label>
-                </a>
-
-                <a
-                    href="server.html?server=hotland"
-                    class="server"
-                >
-                    <span>🔥</span>
-                    <label>Hotland</label>
-                </a>
-
-            </div>
-
-
-            <button
-                type="button"
-                class="add-server"
-            >
-                ＋ Add Server
-            </button>
-
-
-<!-- BOTTOM NAV -->
-
-<div class="nav-bottom">
-
-    <!-- ENABLE NOTIFICATIONS -->
-
-    <button
-        type="button"
-        id="enable-notifications"
-        style="
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            border: 0;
-            background: transparent;
-            color: inherit;
-            padding: 10px;
-            cursor: pointer;
-            font: inherit;
-            text-align: left;
-        "
-    >
-        <span>🔔</span>
-        <label>Enable Notifications</label>
-    </button>
-
-
-    <!-- ACTIVITY -->
-
-    <a
-        href="#"
-        class="nav-link"
-    >
-        <span>🔔</span>
-        <label>Activity</label>
-    </a>
-
-
-    <!-- SETTINGS -->
-
-    <a
-        href="#"
-        class="nav-link"
-    >
-        <span>⚙️</span>
-        <label>Settings</label>
-    </a>
-
-
-    <!-- LOG OUT -->
-
-    <button
-        type="button"
-        class="nav-link logout"
-        id="logout-button"
-    >
-        <span>↪️</span>
-        <label>Log Out</label>
-    </button>
+</main>
+```
 
 </div>
-
-    <!-- MAIN CONTENT -->
-
-    <main class="content">
-
-        <div class="content-header">
-
-            <h2>
-                Home
-            </h2>
-
-        </div>
-
-
-        <div class="content-body">
-
-            <div class="welcome">
-
-                <div class="welcome-icon">
-                    👋
-                </div>
-
-                <h1>
-                    Welcome to the Undernet!
-                </h1>
-
-                <p>
-                    You're logged in as
-                    <strong id="welcome-username">
-                        Loading...
-                    </strong>.
-                </p>
-
-
-                <div class="quick-actions">
-
-                    <button
-                        type="button"
-                        onclick="window.location.href='messages.html'"
-                    >
-                        💬 Messages
-                    </button>
-
-                    <button
-                        type="button"
-                        onclick="window.location.href='friends.html'"
-                    >
-                        👥 Friends
-                    </button>
-
-                </div>
-
-
-                <!-- NOTIFICATION HELP -->
-
-                <p style="margin-top: 20px;">
-                    🔔 Enable notifications to receive
-                    Undernet alerts.
-                </p>
-
-            </div>
-
-        </div>
-
-    </main>
-
-</div>
-
 
 <!-- SUPABASE / PROFILE -->
 
@@ -303,7 +313,6 @@
     type="module"
     src="profile.js"
 ></script>
-
 
 <!-- NOTIFICATIONS -->
 
