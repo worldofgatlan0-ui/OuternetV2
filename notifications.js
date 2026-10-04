@@ -232,65 +232,107 @@ export function showBrowserNotification({
         };
 }
 
-// ==========================================
-// OUTERNETV2 PUSH NOTIFICATIONS
-// ==========================================
+
+/* =========================
+   PUSH NOTIFICATIONS
+========================= */
 
 async function setupPushNotifications() {
-  // Check if this browser supports service workers
-  if (!("serviceWorker" in navigator)) {
-    console.log("❌ Service workers are not supported.");
-    return;
-  }
 
-  // Check if this browser supports notifications
-  if (!("Notification" in window)) {
-    console.log("❌ Browser notifications are not supported.");
-    return;
-  }
+    /* Check service worker support */
 
-  try {
-    // Register our service worker
-    const registration = await navigator.serviceWorker.register(
-      "/OuternetV2/sw.js"
-    );
+    if (!("serviceWorker" in navigator)) {
 
-    console.log("🔔 Service worker registered!");
-     
-    const subscription =
-    await registration.pushManager.subscribe({
-        userVisibleOnly: true
-    });
+        console.log(
+            "❌ Service workers are not supported."
+        );
 
-console.log(
-    "📡 PUSH SUBSCRIPTION CREATED:",
-    subscription
-);
-     
-     const subscription =
-    await registration.pushManager.subscribe({
-        userVisibleOnly: true
-    });
-
-console.log("📡 PUSH SUBSCRIPTION CREATED:", subscription);
-
-    // Ask the user for permission
-    const permission = await Notification.requestPermission();
-
-    if (permission === "granted") {
-      console.log("✅ Notification permission granted!");
-    } else {
-      console.log("❌ Notification permission denied.");
+        return;
     }
 
-  } catch (error) {
-    console.error("❌ Push notification setup failed:", error);
-  }
+
+    /* Check notification support */
+
+    if (!("Notification" in window)) {
+
+        console.log(
+            "❌ Browser notifications are not supported."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        /* Register service worker */
+
+        const registration =
+            await navigator.serviceWorker.register(
+                "/OuternetV2/sw.js"
+            );
+
+
+        console.log(
+            "🔔 Service worker registered!"
+        );
+
+
+        /* Ask for notification permission */
+
+        const permission =
+            await requestNotificationPermission();
+
+
+        if (!permission) {
+
+            console.log(
+                "❌ Notification permission was not granted."
+            );
+
+            return;
+        }
+
+
+        console.log(
+            "✅ Notification permission granted!"
+        );
+
+
+        /* Create push subscription */
+
+        const subscription =
+            await registration.pushManager.subscribe({
+                userVisibleOnly: true
+            });
+
+
+        console.log(
+            "📡 PUSH SUBSCRIPTION CREATED:",
+            subscription
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Push notification setup failed:",
+            error
+        );
+
+    }
 }
 
 
+/* =========================
+   ENABLE NOTIFICATIONS BUTTON
+========================= */
+
 const notificationButton =
-    document.getElementById("enable-notifications");
+    document.getElementById(
+        "enable-notifications"
+    );
+
 
 if (notificationButton) {
 
