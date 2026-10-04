@@ -231,3 +231,46 @@ export function showBrowserNotification({
             notification.close();
         };
 }
+
+// ==========================================
+// OUTERNETV2 PUSH NOTIFICATIONS
+// ==========================================
+
+async function setupPushNotifications() {
+  // Check if this browser supports service workers
+  if (!("serviceWorker" in navigator)) {
+    console.log("❌ Service workers are not supported.");
+    return;
+  }
+
+  // Check if this browser supports notifications
+  if (!("Notification" in window)) {
+    console.log("❌ Browser notifications are not supported.");
+    return;
+  }
+
+  try {
+    // Register our service worker
+    const registration = await navigator.serviceWorker.register(
+      "/OuternetV2/sw.js"
+    );
+
+    console.log("🔔 Service worker registered!");
+
+    // Ask the user for permission
+    const permission = await Notification.requestPermission();
+
+    if (permission === "granted") {
+      console.log("✅ Notification permission granted!");
+    } else {
+      console.log("❌ Notification permission denied.");
+    }
+
+  } catch (error) {
+    console.error("❌ Push notification setup failed:", error);
+  }
+}
+
+
+// Start notification setup when the page loads
+window.addEventListener("load", setupPushNotifications);
