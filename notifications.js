@@ -237,6 +237,26 @@ export function showBrowserNotification({
    PUSH NOTIFICATIONS
 ========================= */
 
+function urlBase64ToUint8Array(base64String) {
+    const padding = "=".repeat(
+        (4 - (base64String.length % 4)) % 4
+    );
+
+    const base64 = (
+        base64String + padding
+    )
+        .replace(/-/g, "+")
+        .replace(/_/g, "/");
+
+    const rawData = atob(base64);
+
+    return Uint8Array.from(
+        [...rawData].map(
+            char => char.charCodeAt(0)
+        )
+    );
+}
+
 async function setupPushNotifications() {
 
     /* Check service worker support */
@@ -301,9 +321,16 @@ async function setupPushNotifications() {
 
         /* Create push subscription */
 
-        const subscription =
-            await registration.pushManager.subscribe({
-                userVisibleOnly: true
+     const VAPID_PUBLIC_KEY =
+    "BLYDjCkhu00nKYXF59nIFb6nPG5gBjyyCikDJNv0ArdL96YcnK7GJxb9-JcHPAuCT5zWRXfI0WuNXMoY8DGZ-B0";
+
+const subscription =
+    await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(
+            VAPID_PUBLIC_KEY
+        )
+    });
             });
 
 
